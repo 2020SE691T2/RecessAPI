@@ -1,1 +1,1 @@
-web: gunicorn myapp.wsgi --log-file -
+web: gunicorn RecessApplication.wsgi --log-file -
