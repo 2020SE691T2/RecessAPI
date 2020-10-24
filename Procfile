@@ -1,0 +1,1 @@
+web: gunicorn RecessApplication.wsgi --log-file -
