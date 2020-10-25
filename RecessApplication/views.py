@@ -1,8 +1,8 @@
 from django.contrib.auth.models import User, Group
 from django.contrib.auth import get_user_model
 from rest_framework import generics, viewsets
-from RecessApplication.serializers import CustomUserSerializer, GroupSerializer, CustomClassSerializer
-from RecessApplication.models import CustomClass
+from RecessApplication.serializers import CustomUserSerializer, GroupSerializer, ClassSerializer, ClassEnrollmentSerializer, ClassScheduleSerializer, AssignmentSerializer
+from RecessApplication.models import Class, ClassEnrollment, ClassSchedule, Assignment
 
 User = get_user_model()
 
@@ -35,5 +35,27 @@ class ClassViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows classes to be viewed or edited.
     """
-    queryset = CustomClass.objects.all()
-    serializer_class = CustomClassSerializer
+    queryset = Class.objects.all()
+    serializer_class = ClassSerializer
+
+class ClassEnrollmentViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows class enrollments to be viewed or edited.
+    """
+    queryset = ClassEnrollment.objects.all()
+    serializer_class = ClassEnrollmentSerializer
+
+class ClassScheduleViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows class schedules to be viewed or edited.
+    """
+    queryset = ClassSchedule.objects.all()
+    serializer_class = ClassScheduleSerializer
+
+
+class ClassScheduleViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows class schedules to be viewed or edited.
+    """
+    queryset = Assignment.objects.all()
+    serializer_class = AssignmentSerializer

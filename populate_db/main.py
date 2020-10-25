@@ -4,13 +4,12 @@ import pandas as pd
 import psycopg2
 
 if __name__ == "__main__":
-    
-    '''
-      build database tables if they don't exit
-      populate these tables with data from the schema and csvs
-    '''
-    try:
-    # your stuff here
+        
+        '''
+          build database tables if they don't exit
+          populate these tables with data from the schema and csvs
+        '''
+#    try:
         recess_database = Build_DB()
         
         # create the tables
@@ -29,7 +28,7 @@ if __name__ == "__main__":
         
         print("database successfully built!")
         
-    except psycopg2.Error as e:
-        error = e.pgcode
-        print("psycopg2 error code = "+error)
-        print("See https://www.postgresql.org/docs/current/errcodes-appendix.html for code definitions!")
+#    except psycopg2.Error as e:
+#        error = e.pgcode
+#        print("psycopg2 error code = "+error)
+#        print("See https://www.postgresql.org/docs/current/errcodes-appendix.html for code definitions!")

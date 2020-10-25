@@ -3,7 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from django.contrib.auth import get_user_model
 
-from .managers import CustomUserManager, CustomClassManager
+from .managers import CustomUserManager, ClassManager, ClassEnrollmentManager, ClassScheduleManager, AssignmentManager
 
 class CustomUser(AbstractBaseUser):
     last_login = None
@@ -31,7 +31,7 @@ class CustomUser(AbstractBaseUser):
     def __str__(self):
         return self.email_address
 
-class CustomClass(models.Model):
+class Class(models.Model):
     """
     """
     # required and unique
@@ -44,10 +44,71 @@ class CustomClass(models.Model):
     CLASSNAME_FIELD = 'class_id'
     REQUIRED_FIELDS = ['class_name', 'meeting_link', 'year', 'section']
     
-    objects = CustomClassManager()
+    objects = ClassManager()
     
     class Meta:
         db_table = 'classes'
     
     def __str__(self):
         return self.class_id
+
+class ClassEnrollment(models.Model):
+    """
+    """
+    # required and unique
+    class_id = models.CharField(max_length=100, blank=False, editable=False)
+    teacher_email = models.EmailField(_('email_address')) 
+    student_email = models.EmailField(_('email_address')) 
+
+    CLASSNAME_FIELD = 'class_id'
+    REQUIRED_FIELDS = ['teacher_email', 'student_email']
+    
+    objects = ClassEnrollmentManager()
+    
+    class Meta:
+        db_table = 'class_enrollment'
+    
+    def __str__(self):
+        return self.class_id
+
+class ClassSchedule(models.Model):
+    """
+    """
+    # required and unique
+    class_id = models.CharField(max_length=100, blank=True, default='')
+    date = models.DateField()
+    start_time = models.TimeField()
+    end_time = models.TimeField()
+
+    CLASSNAME_FIELD = 'class_id'
+    REQUIRED_FIELDS = ['date', 'start_time', 'end_time']
+    
+    objects = ClassScheduleManager()
+    
+    class Meta:
+        db_table = 'class_schedule'
+    
+    def __str__(self):
+        return self.class_id
+
+class Assignment(models.Model):
+    """
+    """
+    # required and unique
+    assignment_id = models.CharField(max_length=100, blank=True, default='', primary_key=True)
+    name = models.CharField(max_length=10000, blank=True, default='')
+    description = models.CharField(max_length=100000, blank=True, default='')
+    assigned_date = models.DateField()
+    due_date = models.DateField()
+    class_id = models.CharField(max_length=100, blank=True, default='')
+
+    ASSIGNMENTNAME_FIELD = 'assignment_id'
+    REQUIRED_FIELDS = ['name', 'description', 'assigned_date', 'due_date', 'class_id']
+    
+    objects = AssignmentManager()
+    
+    class Meta:
+        db_table = 'assignments'
+    
+    def __str__(self):
+        return self.assignment_id
