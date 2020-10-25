@@ -9,7 +9,7 @@ if [ ! -d "venv/" ]; then
 	echo "Creating virtual environment venv"
 
 	# Create virtual environment
-	python -m venv venv
+	python3 -m venv venv
 
  else
 	echo "venv already exists - just going to update"
@@ -18,10 +18,11 @@ fi
 echo "Entering venv first"
 
 # Enter the virtual environment
-source venv/Scripts/activate
+activate() { . $PWD/venv/bin/activate; }
+activate
 
 # Get latest pip
-python -m pip install --upgrade pip
+python3 -m pip3 install --upgrade pip3
 
 # Get latest requirements
-pip install -r requirements.txt
+pip3 install -r requirements.txt

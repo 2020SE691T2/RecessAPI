@@ -14,7 +14,7 @@ class CustomUserManager(BaseUserManager):
         if not email:
             raise ValueError(_('The Email must be set'))
         email = self.normalize_email(email)
-        user = self.model(email=email, **extra_fields)
+        user = self.model(email_address=email, **extra_fields)
         user.set_password(password)
         user.save()
         return user
@@ -26,7 +26,21 @@ class CustomUserManager(BaseUserManager):
         if not email:
             raise ValueError(_('The Email must be set'))
         email = self.normalize_email(email)
-        user = self.model(email=email, **extra_fields)
+        user = self.model(email_address=email, **extra_fields)
         user.set_password(password)
         user.save()
         return user
+
+class CustomClassManager():
+    """
+    Custom class model manager where class id is the unique identifiers
+    for authentication instead of usernames.
+    """
+    def get_class_data(self, class_id, **extra_fields):
+        """
+        return a class.
+        """
+        if not class_id:
+            raise ValueError(_('The class does not exist!'))
+        class_data = self.model(class_id=class_id, **extra_fields)
+        return class_data

@@ -4,15 +4,16 @@
 cd ..
 
 # Enter the virtual environment
-source venv/Scripts/activate
+activate() { . $PWD/venv/bin/activate; }
+activate
 
 # Enter backend code area
-cd RecessApplication/
+#cd RecessApplication/
 
 # Run tests
-echo "Running tests"
-python manage.py test
+#echo "Running tests"
+#python3 manage.py test
 
 # Start the server
 echo "Starting backend"
-python manage.py runserver
+python3 manage.py runserver
