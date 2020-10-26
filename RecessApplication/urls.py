@@ -24,6 +24,9 @@ router = routers.DefaultRouter()
 router.register(r'users', views.UserViewSet)
 router.register(r'groups', views.GroupViewSet)
 router.register(r'class_info', views.ClassViewSet)
+router.register(r'class_enrollment', views.ClassEnrollmentViewSet)
+router.register(r'class_schedule', views.ClassScheduleViewSet)
+router.register(r'assignments', views.ClassScheduleViewSet)
 #router.register(r'auth', auth.AuthBackend)
 
 # Wire up our API using automatic URL routing.

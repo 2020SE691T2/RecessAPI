@@ -31,7 +31,7 @@ class CustomUserManager(BaseUserManager):
         user.save()
         return user
 
-class CustomClassManager():
+class ClassManager():
     """
     Custom class model manager where class id is the unique identifiers
     for authentication instead of usernames.
@@ -44,3 +44,45 @@ class CustomClassManager():
             raise ValueError(_('The class does not exist!'))
         class_data = self.model(class_id=class_id, **extra_fields)
         return class_data
+
+class ClassEnrollmentManager():
+    """
+    Custom class model manager where class id is the unique identifiers
+    for authentication instead of usernames.
+    """
+    def get_class_enrollment_data(self, class_id, **extra_fields):
+        """
+        return a class.
+        """
+        if not class_id:
+            raise ValueError(_('The class does not exist!'))
+        class_data = self.model(class_id=class_id, **extra_fields)
+        return class_data
+
+class ClassScheduleManager():
+    """
+    Custom class model manager where class id is the unique identifiers
+    for authentication instead of usernames.
+    """
+    def get_class_schedule_data(self, class_id, **extra_fields):
+        """
+        return a class.
+        """
+        if not class_id:
+            raise ValueError(_('The class does not exist!'))
+        class_data = self.model(class_id=class_id, **extra_fields)
+        return class_data
+
+class AssignmentManager():
+    """
+    Custom assignment model manager where assignment id is the unique identifiers
+    for authentication instead of usernames.
+    """
+    def get_assignment_schedule_data(self, assignment_id, **extra_fields):
+        """
+        return a class.
+        """
+        if not assignment_id:
+            raise ValueError(_('The assignment does not exist!'))
+        assignment_data = self.model(assignment_id=assignment_id, **extra_fields)
+        return assginment_data

@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import serializers
-from RecessApplication.models import CustomUser, CustomClass
+from RecessApplication.models import CustomUser, Class, ClassEnrollment, ClassSchedule, Assignment
 from django.contrib.auth import authenticate
 
 class CustomUserSerializer(serializers.HyperlinkedModelSerializer):
@@ -23,7 +23,22 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
         model = Group
         fields = ['url', 'name']
 
-class CustomClassSerializer(serializers.HyperlinkedModelSerializer):
+class ClassSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = CustomClass
+        model = Class
         fields = ['class_id', 'class_name', 'meeting_link', 'year', 'section']
+
+class ClassEnrollmentSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = ClassEnrollment
+        fields = ['class_id', 'teacher_email', 'student_email']
+
+class ClassScheduleSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = ClassSchedule
+        fields = ['class_id', 'date', 'start_time', 'end_time']
+
+class AssignmentSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Assignment
+        fields = ['assignment_id', 'name', 'description', 'assigned_date', 'due_date', 'class_id']
