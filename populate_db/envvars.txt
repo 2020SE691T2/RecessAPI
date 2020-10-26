@@ -1,0 +1,1 @@
+database_uri=postgres://xgfkiciegnvnhv:edb5aa46c6f7ecad5c50658a44c5c65226ad4f2d84ef9959eb76cc670aba77ab@ec2-54-90-68-208.compute-1.amazonaws.com:5432/deo87b8qamkg3r

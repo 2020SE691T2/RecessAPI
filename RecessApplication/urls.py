@@ -16,13 +16,17 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 from rest_framework import routers
-from rest_framework.urlpatterns import format_suffix_patterns
+#from rest_framework.urlpatterns import format_suffix_patterns
 from RecessApplication import views
 from .api import LoginAPI, RegistrationAPI
 
 router = routers.DefaultRouter()
 router.register(r'users', views.UserViewSet)
 router.register(r'groups', views.GroupViewSet)
+router.register(r'class_info', views.ClassViewSet)
+router.register(r'class_enrollment', views.ClassEnrollmentViewSet)
+router.register(r'class_schedule', views.ClassScheduleViewSet)
+router.register(r'assignments', views.ClassScheduleViewSet)
 #router.register(r'auth', auth.AuthBackend)
 
 # Wire up our API using automatic URL routing.
@@ -32,5 +36,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('api-auth/register/', RegistrationAPI.as_view()),
-    path('api-auth/login/', LoginAPI.as_view()),
+    path('api-auth/auth/', LoginAPI.as_view()),
 ]
