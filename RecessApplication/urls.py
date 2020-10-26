@@ -33,5 +33,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('api-auth/register/', RegistrationAPI.as_view()),
-    path('api-auth/login/', LoginAPI.as_view()),
+    path('api-auth/auth/', LoginAPI.as_view()),
 ]

@@ -9,12 +9,11 @@ class CustomUserSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['email_address', 'first_name', 'last_name', 'preferred_name', 'password', 'physical_id_num', 'dob','role']
 
 class LoginUserSerializer(serializers.Serializer):
-    username = serializers.EmailField()
+    email_address = serializers.EmailField()
     password = serializers.CharField()
 
     def validate(self, data):
         user = authenticate(username=data['email_address'], password=data['password'])
-        print(f'User = {user}')
         if user and user.is_active:
             return user
         raise serializers.ValidationError(f'Unable to log in with provided credentials. user={user}, data={data}')
