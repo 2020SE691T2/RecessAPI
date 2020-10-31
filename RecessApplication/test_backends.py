@@ -27,7 +27,7 @@ class TestBackend:
         result = user_backend.authenticate(request=None, password=TestBackend.PASSWORD)
         assert result == self.mock_user()
 
-    def test_authenticate_wrongPassword(self):
+    def test_authenticate_wrong_password(self):
         user_backend = self.mock_user_backend()
         result = user_backend.authenticate(request=None, password="NOT_PASSWORD")
         assert result == None
