@@ -11,9 +11,9 @@ class TestBackend:
     PASSWORD = "TEST_PASSWORD"
 
     def mock_user_backend(self):
-        userBackend = UserBackend()
-        userBackend.get_user = MagicMock(return_value=self.mock_user())
-        return userBackend
+        user_backend = UserBackend()
+        user_backend.get_user = MagicMock(return_value=self.mock_user())
+        return user_backend
 
     def mock_user(self):
         user = CustomUser()
@@ -23,11 +23,11 @@ class TestBackend:
 
     # All tests should start with 'test_'
     def test_authenticate_success(self):
-        userBackend = self.mock_user_backend()
-        result = userBackend.authenticate(request=None, password=TestBackend.PASSWORD)
+        user_backend = self.mock_user_backend()
+        result = user_backend.authenticate(request=None, password=TestBackend.PASSWORD)
         assert result == self.mock_user()
 
     def test_authenticate_wrongPassword(self):
-        userBackend = self.mock_user_backend()
-        result = userBackend.authenticate(request=None, password="NOT_PASSWORD")
+        user_backend = self.mock_user_backend()
+        result = user_backend.authenticate(request=None, password="NOT_PASSWORD")
         assert result == None
