@@ -16,7 +16,7 @@ class CustomUser(AbstractBaseUser):
     physical_id_num = models.CharField(max_length=100, blank=True, default='')
     dob = models.DateField(auto_now_add=False)
     role = models.CharField(max_length=100, blank=True, default='')
-    photo = models.CharField(max_length=1000, blank=True, default='')
+    photo = models.CharField(max_length=1000000, blank=True, default='')
 
     # Password included already...
     #password = models.CharField(max_length=100, blank=True, default='')
