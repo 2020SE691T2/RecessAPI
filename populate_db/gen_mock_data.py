@@ -12,7 +12,7 @@ def get_photos():
     with open("./photos.txt") as file:
         for line in file:
             line.strip()
-            photos.append(line)
+            photos.append(line.rstrip('\n'))
     return photos
 
 def dob_generator():
