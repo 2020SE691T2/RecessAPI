@@ -4,6 +4,17 @@ import random
 import string
 import numpy as np
 
+def get_photos():
+    """
+    get list of mock student photos from base64 encoded text file
+    """
+    photos = []
+    with open("./photos.txt") as file:
+        for line in file:
+            line.strip()
+            photos.append(line)
+    return photos
+
 def dob_generator():
     '''
     randomly generate a date of birth
@@ -70,7 +81,8 @@ def generate_users_table(n: int) -> pd.DataFrame:
     Return: 
         .csv file with mock data
     """
-    
+    photos = get_photos()
+
     df_dict = {
         "first_name": [
             "".join(np.random.choice([i for i in string.ascii_lowercase], random.randint(5, 10))) for i in range(n)
@@ -86,7 +98,8 @@ def generate_users_table(n: int) -> pd.DataFrame:
         ],
         "physical_id_num": [str(uuid.uuid4()) for i in range(n)],
         "dob": [dob_generator() for i in range(n)],
-        "role" : [random.choice(["teacher", "student"]) for i in range(n)]
+        "role" : [random.choice(["teacher", "student"]) for i in range(n)],
+        "photo" : [photos[random.randint(0, len(photos))-1] for i in range(n)]
     }
     
     df_dict["email_address"] = [
