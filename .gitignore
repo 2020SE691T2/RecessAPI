@@ -1,4 +1,5 @@
 RecessApplication/migrations/
 RecessApplication/__pycache__/
 venv/
-
+.coverage
+coverage-reports/
