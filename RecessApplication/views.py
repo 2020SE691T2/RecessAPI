@@ -87,7 +87,7 @@ class ZoomMeetingsView(APIView):
 
     def post(self, request, format=None):
         topic = request.data.get('topic', None)
-        type = request.data.get('type', None)
+        meeting_type = request.data.get('meeting_type', None)
         start_time = request.data.get('start_time', datetime.datetime.now())
         duration = request.data.get('duration', 60)
         return self.proxy.create_meeting(topic=topic, type=type, start_time=start_time, duration=duration)

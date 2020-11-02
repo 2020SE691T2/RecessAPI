@@ -25,18 +25,18 @@ class ZoomProxy:
         print('User ID is', ZoomProxy.user_id)
 
     """
-    type - integer
+    meeting_type - integer
         1 - Instant meeting
         2 - Fixed meeting
         3 - Recurring meeting with no fixed time
         8 - Recurring meeting with fixed time
     """
-    def create_meeting(self, topic, type, start_time=None, duration=None):
-        meeting_create_response = self.client.meeting.create(user_id=ZoomProxy.user_id, topic=topic, type=type, start_time=start_time, duration=duration)
+    def create_meeting(self, topic, meeting_type, start_time=None, duration=None):
+        meeting_create_response = self.client.meeting.create(user_id=ZoomProxy.user_id, topic=topic, type=meeting_type, start_time=start_time, duration=duration)
         print("You are here")
-        print("Type is ", type)
+        print("Type is ", meeting_type)
         print("Start time is ", start_time)
-        dateString = start_time.strftime("%Y-%m-%dT%H:%M:%SZ")
+        date_string = start_time.strftime("%Y-%m-%dT%H:%M:%SZ")
         print("That formatted is ", dateString)
         print(meeting_create_response.content)
         print(meeting_create_response.content, meeting_create_response.status_code)
