@@ -37,7 +37,7 @@ class ZoomProxy:
         print("Type is ", meeting_type)
         print("Start time is ", start_time)
         date_string = start_time.strftime("%Y-%m-%dT%H:%M:%SZ")
-        print("That formatted is ", dateString)
+        print("That formatted is ", date_string)
         print(meeting_create_response.content)
         print(meeting_create_response.content, meeting_create_response.status_code)
         
