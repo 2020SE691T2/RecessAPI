@@ -2,9 +2,12 @@ from django.contrib.auth.models import User, Group
 from django.contrib.auth import get_user_model
 from rest_framework import generics, viewsets
 from rest_framework.decorators import action
+from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 from RecessApplication.serializers import CustomUserSerializer, GroupSerializer, ClassSerializer, ClassEnrollmentSerializer, ClassScheduleSerializer, AssignmentSerializer
 from RecessApplication.models import Class, ClassEnrollment, ClassSchedule, Assignment
+from .zoom import ZoomProxy
+import datetime
 
 import urllib.parse
 
@@ -69,3 +72,32 @@ class ClassScheduleViewSet(viewsets.ModelViewSet):
     """
     queryset = Assignment.objects.all()
     serializer_class = AssignmentSerializer
+
+class ZoomMeetingsView(APIView):
+    """
+    Interact with the Zoom Meeting API.
+    """
+    def __init__(self):
+        self.proxy = ZoomProxy()
+
+    def get(self, request, format=None):
+        meeting_id = request.query_params.get('meeting_id', None)
+        print("Meeting id is ", meeting_id)
+        return self.proxy.get_meeting(meeting_id=meeting_id)
+
+    def post(self, request, format=None):
+        topic = request.data.get('topic', None)
+        type = request.data.get('type', None)
+        start_time = request.data.get('start_time', datetime.datetime.now())
+        duration = request.data.get('duration', 60)
+        return self.proxy.create_meeting(topic=topic, type=type, start_time=start_time, duration=duration)
+
+class ZoomMeetingsListView(APIView):
+    """
+    Interact with the Zoom Meetings API.
+    """
+    def __init__(self):
+        self.proxy = ZoomProxy()
+
+    def get(self, request, format=None):
+        return self.proxy.list_meetings()
