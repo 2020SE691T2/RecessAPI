@@ -15,17 +15,18 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path, re_path
-from rest_framework import routers
 from RecessApplication import views
 from .api import LoginAPI, RegistrationAPI
+from .router import OptionalSlashRouter
 
-router = routers.DefaultRouter(trailing_slash=False)
-router.register(r'users/?', views.UserViewSet)
-router.register(r'groups/?', views.GroupViewSet)
-router.register(r'class_info/?', views.ClassViewSet)
-router.register(r'class_enrollment/?', views.ClassEnrollmentViewSet)
-router.register(r'class_schedule/?', views.ClassScheduleViewSet)
-router.register(r'assignments/?', views.ClassScheduleViewSet)
+router = OptionalSlashRouter()
+
+router.register(r'users', views.UserViewSet)
+router.register(r'groups', views.GroupViewSet)
+router.register(r'class_info', views.ClassViewSet)
+router.register(r'class_enrollment', views.ClassEnrollmentViewSet)
+router.register(r'class_schedule', views.ClassScheduleViewSet)
+router.register(r'assignments', views.ClassScheduleViewSet)
 
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.
