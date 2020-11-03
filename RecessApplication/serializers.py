@@ -20,7 +20,7 @@ class CustomUserSerializer(serializers.HyperlinkedModelSerializer):
         #profile_data = validated_data.pop('profile')
         #profile = instance.profile
 
-        instance.email_address = validated_data.get('email_address', instance.email)
+        instance.email_address = validated_data.get('email_address', instance.email_address)
         instance.save()
 
         instance.first_name = validated_data.get('first_name')
