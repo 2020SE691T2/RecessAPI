@@ -86,22 +86,22 @@ def generate_users_table(n: int) -> pd.DataFrame:
     fake_person = faker.Faker()
     df_dict = {
         "first_name": [
-            fake_person.first_name() for i in range(n)
+            fake_person.first_name() for _ in range(n)
         ],
 
         "last_name": [
-            fake_person.unique.last_name() for i in range(n)
+            fake_person.unique.last_name() for _ in range(n)
         ],
         "preferred_name": [
-            fake_person.unique.first_name() for i in range(n)
+            fake_person.unique.first_name() for _ in range(n)
         ],
         "password": [
-            fake_person.unique.password() for i in range(n)
+            fake_person.unique.password() for _ in range(n)
         ],
-        "physical_id_num": [str(uuid.uuid4()) for i in range(n)],
-        "dob": [dob_generator() for i in range(n)],
-        "role" : [random.choice(["teacher", "student"]) for i in range(n)],
-        "photo" : [photos[random.randint(0, len(photos))-1] for i in range(n)]
+        "physical_id_num": [str(uuid.uuid4()) for _ in range(n)],
+        "dob": [dob_generator() for _ in range(n)],
+        "role" : [random.choice(["teacher", "student"]) for _ in range(n)],
+        "photo" : [photos[random.randint(0, len(photos))-1] for _ in range(n)]
     }
     
     df_dict["email_address"] = [
