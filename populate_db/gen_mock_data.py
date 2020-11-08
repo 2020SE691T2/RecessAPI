@@ -85,21 +85,6 @@ def generate_users_table(n: int) -> pd.DataFrame:
     photos = get_photos()
     fake_person = faker.Faker()
     df_dict = {
-#        "first_name": [
-#            "".join(np.random.choice([i for i in string.ascii_lowercase], random.randint(5, 10))) for i in range(n)
-#        ],
-#        "last_name": [
-#            "".join(np.random.choice([i for i in string.ascii_lowercase], random.randint(3, 10))) for i in range(n)
-#        ],
-#        "preferred_name": [
-#            "".join(np.random.choice([i for i in string.ascii_lowercase], random.randint(3, 10))) for i in range(n)
-#        ],
-#        "password": [
-#            "".join(np.random.choice([i for i in string.ascii_lowercase], random.randint(3, 10))) for i in range(n)
-#        ],
-#        "physical_id_num": [str(uuid.uuid4()) for i in range(n)],
-#        "dob": [dob_generator() for i in range(n)],
-
         "first_name": [
             fake_person.first_name() for i in range(n)
         ],
@@ -123,6 +108,15 @@ def generate_users_table(n: int) -> pd.DataFrame:
         f"{first_name}.{last_name}@schoolmail.com"
         for first_name, last_name in zip(df_dict["first_name"], df_dict["last_name"])
     ]
+    
+    df_dict["is_staff"] = [
+        True if role == "teacher" else False for role in df_dict["role"]
+    ]
+    
+    df_dict["is_superuser"] = [
+        True if staff is True else False for staff in df_dict["is_staff"]
+    ]
+    
     
     df = pd.DataFrame(df_dict)
     df.to_csv("users_table.csv", index=False)
