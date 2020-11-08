@@ -37,7 +37,7 @@ fi
 
 # set vars
 if [ ${database_type} == "Heroku" ]; then
-    database_uri=$(awk -F "=" '/^database_uri=/ {print $2}' envvars.txt)
+    database_uri=$(awk -F "=" '/^database_heroku=/ {print $2}' envvars.txt)
 else
     if [ ${database_type} == "local" ]; then
         database_uri=$(awk -F "=" '/^database_local=/ {print $2}' envvars.txt)
