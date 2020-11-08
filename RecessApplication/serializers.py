@@ -7,7 +7,7 @@ class CustomUserSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ['email_address', 'first_name', 'last_name', 'preferred_name', 'password', 'physical_id_num', 'dob','role', 'photo']
+        fields = ['email_address', 'first_name', 'last_name', 'preferred_name', 'password', 'physical_id_num', 'dob','role', 'photo', 'is_staff', 'is_superuser']
 
     def create(self, validated_data):
         password = validated_data.pop('password')
@@ -20,7 +20,7 @@ class CustomUserSerializer(serializers.HyperlinkedModelSerializer):
         #profile_data = validated_data.pop('profile')
         #profile = instance.profile
 
-        instance.email_address = validated_data.get('email_address', instance.email)
+        instance.email_address = validated_data.get('email_address', instance.email_address)
         instance.save()
 
         instance.first_name = validated_data.get('first_name')
@@ -29,6 +29,9 @@ class CustomUserSerializer(serializers.HyperlinkedModelSerializer):
         instance.physical_id_num = validated_data.get('physical_id_num')
         instance.dob = validated_data.get('dob')
         instance.role = validated_data.get('role')
+        instance.photo = validated_data.get('photo')
+        instance.is_staff = validated_data.get('is_staff')
+        instance.is_superuser = validated_data.get('is_superuser')
 
         instance.save()
 

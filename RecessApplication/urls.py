@@ -14,27 +14,28 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import include, path
-from rest_framework import routers
-#from rest_framework.urlpatterns import format_suffix_patterns
+from django.urls import include, path, re_path
 from RecessApplication import views
 from .api import LoginAPI, RegistrationAPI
+from .router import OptionalSlashRouter
 
-router = routers.DefaultRouter()
+router = OptionalSlashRouter()
+
 router.register(r'users', views.UserViewSet)
 router.register(r'groups', views.GroupViewSet)
 router.register(r'class_info', views.ClassViewSet)
 router.register(r'class_enrollment', views.ClassEnrollmentViewSet)
 router.register(r'class_schedule', views.ClassScheduleViewSet)
 router.register(r'assignments', views.ClassScheduleViewSet)
-#router.register(r'auth', auth.AuthBackend)
 
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.
 urlpatterns = [
     path('', include(router.urls)),
-    path('admin/', admin.site.urls),
-    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    path('api-auth/register/', RegistrationAPI.as_view()),
-    path('api-auth/auth/', LoginAPI.as_view()),
+    re_path(r'^admin/?', admin.site.urls),
+    re_path(r'^api-auth/register/?', RegistrationAPI.as_view()),
+    re_path(r'^api-auth/auth/?', LoginAPI.as_view()),
+    re_path(r'^api-auth/?', include('rest_framework.urls', namespace='rest_framework')),
+    re_path(r'^zoom/meetings/list/?', views.ZoomMeetingsListView.as_view()),
+    re_path(r'^zoom/meetings/?', views.ZoomMeetingsView.as_view()),
 ]

@@ -24,12 +24,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '_4=x29q$v0$kg862o5k7-)i-ty06e#$=45k$pm@m^cui*z@%n7'
 
+# SECURITY WARNING: keep the secret key used in production secret!
+ZOOM_KEY = 'by-2p007QumhxSj7mrN3Qw'
+ZOOM_SECRET = 'sIrBzxBLrtph5xd6GZixJ65yXpwZjtFlfdw3'
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 #CSRF_COOKIE_SECURE = False
 #SESSION_COOKIE_SECURE = False
+
+APPEND_SLASH = False
 
 
 # Application definition

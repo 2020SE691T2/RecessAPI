@@ -17,13 +17,11 @@ class CustomUser(AbstractBaseUser):
     dob = models.DateField(auto_now_add=False)
     role = models.CharField(max_length=100, blank=True, default='')
     photo = models.CharField(max_length=1000000, blank=True, default='')
-
-    # Password included already...
-    #password = models.CharField(max_length=100, blank=True, default='')
-
+    is_staff = models.BooleanField(blank=True, default='')
+    is_superuser = models.BooleanField(blank=True, default='')
+    
     USERNAME_FIELD = 'email_address'
-#    REQUIRED_FIELDS = ['first_name', 'last_name','preferred_name','physical_id_num','dob','role']
-    REQUIRED_FIELDS = ['first_name', 'last_name','preferred_name','physical_id_num','dob','role','photo']
+    REQUIRED_FIELDS = ['first_name', 'last_name','preferred_name','physical_id_num','dob','role','is_staff','is_superuser','photo']
 
     objects = CustomUserManager()
 

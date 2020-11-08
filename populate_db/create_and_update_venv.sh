@@ -1,6 +1,7 @@
 #!/bin/sh
 
 venv_name="db_venv"
+database_type="local"
 
 # check if virtual environment already exists
 if [ ! -d ${venv_name} ]; then
@@ -8,7 +9,7 @@ if [ ! -d ${venv_name} ]; then
     python_version="$(python -V 3>&1)"
     if [ "$(echo $python_version | sed 's/.* \([0-9]\).\([0-9]\).*/\1\2/')" -lt "30" ]; then
         echo "This script requires python 3.0 or greater"
-        exit 1
+        return
     fi
     
     # create the virtual environment
@@ -24,11 +25,27 @@ echo "Activating ${venv_name}"
 activate() { . $PWD/${venv_name}/bin/activate; }
 activate
 
-python3 -m pip3 install --upgrade pip3
+python -m pip install --upgrade pip
 
 # get /update requirements
-pip3 install -r requirements.txt
+pip install -r requirements.txt
+
+# check if database is local only (default is Heroku)
+if [[ ! -z $1 ]]; then
+    database_type=$1
+fi
 
 # set vars
-database_uri=$(awk -F "=" '/^database_uri=/ {print $2}' envvars.txt)
+if [ ${database_type} == "Heroku" ]; then
+    database_uri=$(awk -F "=" '/^database_heroku=/ {print $2}' envvars.txt)
+else
+    if [ ${database_type} == "local" ]; then
+        database_uri=$(awk -F "=" '/^database_local=/ {print $2}' envvars.txt)
+    else
+        echo "unknown database host"
+        return
+    fi
+fi
+
 export database_uri
+export database_type

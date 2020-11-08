@@ -117,7 +117,6 @@ def generate_users_table(n: int) -> pd.DataFrame:
         True if staff is True else False for staff in df_dict["is_staff"]
     ]
     
-    
     df = pd.DataFrame(df_dict)
     df.to_csv("users_table.csv", index=False)
     return(df)

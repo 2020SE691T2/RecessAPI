@@ -2,6 +2,7 @@ from datetime import datetime
 import os
 import pandas as pd
 import psycopg2
+import sys
 
 class Build_DB:
     '''
@@ -11,7 +12,7 @@ class Build_DB:
     
     def __init__(self):
         self.environ = self.set_environment_from_terminal()
-
+    
     def create_table(self, schema: str, table: str):
         '''
         create table in database based on schema
@@ -23,7 +24,7 @@ class Build_DB:
         
         # set the vars in "" as environment variables
         db_connection = psycopg2.connect(self.environ['dbname'], sslmode='require')
-
+        
         self.run_syntax(db_connection=db_connection, syntax=f"CREATE TABLE IF NOT EXISTS {table}({schema})")
         
         db_connection.commit()
@@ -64,14 +65,14 @@ class Build_DB:
         db_connection.close()
         
         return(None)
-
+    
     def run_syntax(self, db_connection: psycopg2, syntax: str):
         '''
-          execute the syntax using the psycopg2 library and the database connection
-         
-          parameters:
-            db_connection: database connection object
-            syntax: the syntax for execution
+        execute the syntax using the psycopg2 library and the database connection
+        
+        parameters:
+          db_connection: database connection object
+          syntax: the syntax for execution
         '''
         cur = db_connection.cursor()
         cur.execute(syntax)
@@ -80,9 +81,13 @@ class Build_DB:
     
     def set_environment_from_terminal(self):
         '''
-        self the environment variables from terminal
+        set the environment variables from terminal
         '''
-        environ = {
-            'dbname' : os.getenv("database_uri")
-        }
+        if os.getenv("database_type") == "Heroku" or os.getenv("database_type") == "local":
+            environ = {
+                'dbname' : os.getenv("database_uri"),
+                'dbtype' : os.getenv("database_type")
+            }
+        else:
+            sys.exit("Host name not valid. Check environment variables.")
         return(environ)
