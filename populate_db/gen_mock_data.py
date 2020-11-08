@@ -107,6 +107,14 @@ def generate_users_table(n: int) -> pd.DataFrame:
         for first_name, last_name in zip(df_dict["first_name"], df_dict["last_name"])
     ]
     
+    df_dict["is_staff"] = [
+        True if role == "teacher" else False for role in df_dict["role"]
+    ]
+    
+    df_dict["is_superuser"] = [
+        True if staff is True else False for staff in df_dict["is_staff"]
+    ]
+    
     df = pd.DataFrame(df_dict)
     df.to_csv("users_table.csv", index=False)
     return(df)
