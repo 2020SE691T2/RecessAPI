@@ -3,6 +3,7 @@ import uuid
 import random
 import string
 import numpy as np
+import faker
 
 def get_photos():
     """
@@ -16,12 +17,12 @@ def get_photos():
     return photos
 
 def dob_generator():
-    '''
+    """
     randomly generate a date of birth
 
     Return:
        dob in the form "mm/dd/yyyy"
-    '''
+    """
     month = random.randint(1, 12)
     year = random.randint(1960, 2020)
     if (month == 2):
@@ -37,7 +38,7 @@ def dob_generator():
     return(str(month)+"/"+str(day)+"/"+str(year))
 
 def get_unique_student_list(users_df: pd.DataFrame, num_students) :
-    '''
+    """
     generate a list of students (with unique emails) for a class
     
     Parameters:
@@ -46,7 +47,7 @@ def get_unique_student_list(users_df: pd.DataFrame, num_students) :
     
     Return: 
         a list of student emails (all unique) from the user table
-    '''
+    """
     student_list = []
     while (len(student_list) <= num_students):
         index = random.randint(0, len(users_df.index)-1)
@@ -82,24 +83,25 @@ def generate_users_table(n: int) -> pd.DataFrame:
         .csv file with mock data
     """
     photos = get_photos()
-
+    fake_person = faker.Faker()
     df_dict = {
         "first_name": [
-            "".join(np.random.choice([i for i in string.ascii_lowercase], random.randint(5, 10))) for i in range(n)
+            fake_person.first_name() for _ in range(n)
         ],
+
         "last_name": [
-            "".join(np.random.choice([i for i in string.ascii_lowercase], random.randint(3, 10))) for i in range(n)
+            fake_person.unique.last_name() for _ in range(n)
         ],
         "preferred_name": [
-            "".join(np.random.choice([i for i in string.ascii_lowercase], random.randint(3, 10))) for i in range(n)
+            fake_person.unique.first_name() for _ in range(n)
         ],
         "password": [
-            "".join(np.random.choice([i for i in string.ascii_lowercase], random.randint(3, 10))) for i in range(n)
+            fake_person.unique.password() for _ in range(n)
         ],
-        "physical_id_num": [str(uuid.uuid4()) for i in range(n)],
-        "dob": [dob_generator() for i in range(n)],
-        "role" : [random.choice(["teacher", "student"]) for i in range(n)],
-        "photo" : [photos[random.randint(0, len(photos))-1] for i in range(n)]
+        "physical_id_num": [str(uuid.uuid4()) for _ in range(n)],
+        "dob": [dob_generator() for _ in range(n)],
+        "role" : [random.choice(["teacher", "student"]) for _ in range(n)],
+        "photo" : [photos[random.randint(0, len(photos))-1] for _ in range(n)]
     }
     
     df_dict["email_address"] = [
