@@ -17,6 +17,7 @@ from django.contrib import admin
 from django.urls import include, path, re_path
 from RecessApplication import views
 from .api import LoginAPI, RegistrationAPI
+import logging
 from .router import OptionalSlashRouter
 
 router = OptionalSlashRouter()
@@ -36,6 +37,9 @@ urlpatterns = [
     re_path(r'^api-auth/register/?', RegistrationAPI.as_view()),
     re_path(r'^api-auth/auth/?', LoginAPI.as_view()),
     re_path(r'^api-auth/?', include('rest_framework.urls', namespace='rest_framework')),
-    re_path(r'^zoom/meetings/list/?', views.ZoomMeetingsListView.as_view()),
-    re_path(r'^zoom/meetings/?', views.ZoomMeetingsView.as_view()),
+    re_path(r'^zoom/meetings/(?P<pk>[0-9]+)/?$', views.ZoomMeetingsView.as_view()),
+    re_path(r'^zoom/meetings/?', views.ZoomMeetingsListView.as_view()),
 ]
+
+logger = logging.getLogger(__name__)
+logger.info("----- INITIALIZATION COMPLETE -----")

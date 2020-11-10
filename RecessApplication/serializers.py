@@ -17,9 +17,6 @@ class CustomUserSerializer(serializers.HyperlinkedModelSerializer):
         return user
 
     def update(self, instance, validated_data):
-        #profile_data = validated_data.pop('profile')
-        #profile = instance.profile
-
         instance.email_address = validated_data.get('email_address', instance.email_address)
         instance.save()
 

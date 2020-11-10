@@ -80,17 +80,11 @@ class ZoomMeetingsView(APIView):
     def __init__(self):
         self.proxy = ZoomProxy()
 
-    def get(self, request, format=None):
-        meeting_id = request.query_params.get('meeting_id', None)
-        print("Meeting id is ", meeting_id)
-        return self.proxy.get_meeting(meeting_id=meeting_id)
+    def get(self, request, pk, format=None):
+        return self.proxy.get_meeting(meeting_id=pk)
 
-    def post(self, request, format=None):
-        topic = request.data.get('topic', None)
-        meeting_type = request.data.get('meeting_type', None)
-        start_time = request.data.get('start_time', datetime.datetime.now())
-        duration = request.data.get('duration', 60)
-        return self.proxy.create_meeting(topic=topic, type=meeting_type, start_time=start_time, duration=duration)
+    def delete(self, request, pk, format=None):
+        return self.proxy.delete_meeting(meeting_id=pk)
 
 class ZoomMeetingsListView(APIView):
     """
@@ -101,3 +95,14 @@ class ZoomMeetingsListView(APIView):
 
     def get(self, request, format=None):
         return self.proxy.list_meetings()
+
+    def post(self, request, format=None):
+        topic = request.data.get('topic', None)
+        meeting_type = request.data.get('meeting_type', None)
+        start_time = request.data.get('start_time', datetime.datetime.now())
+        duration = request.data.get('duration', 60)
+        recurrence_type = request.data.get('recurrence_type', None)
+        weekly_days = request.data.get('weekly_days', None)
+        end_times = request.data.get('end_times', None)
+        end_date_time = request.data.get('end_date_time', None)
+        return self.proxy.create_meeting(topic=topic, meeting_type=meeting_type, start_time=start_time, duration=duration, recurrence_type=recurrence_type, weekly_days=weekly_days, end_times=end_times, end_date_time=end_date_time)
