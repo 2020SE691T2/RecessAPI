@@ -3,6 +3,8 @@ from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from django.contrib.auth import get_user_model
 
+from rest_framework_simplejwt.tokens import RefreshToken
+
 from .managers import CustomUserManager, ClassManager, ClassEnrollmentManager, ClassScheduleManager, AssignmentManager
 
 class CustomUser(AbstractBaseUser):
@@ -10,6 +12,7 @@ class CustomUser(AbstractBaseUser):
 
     # required and unique       
     email_address = models.EmailField(_('email_address'), primary_key=True) 
+    password = models.CharField(max_length=1000000)
     first_name = models.CharField(max_length=100, blank=True, default='')
     last_name = models.CharField(max_length=100, blank=True, default='')
     preferred_name = models.CharField(max_length=100, blank=True, default='')
@@ -17,8 +20,8 @@ class CustomUser(AbstractBaseUser):
     dob = models.DateField(auto_now_add=False)
     role = models.CharField(max_length=100, blank=True, default='')
     photo = models.CharField(max_length=1000000, blank=True, default='')
-    is_staff = models.BooleanField(blank=True, default='')
-    is_superuser = models.BooleanField(blank=True, default='')
+    is_staff = models.BooleanField(blank=True, default=False)
+    is_superuser = models.BooleanField(blank=True, default=False)
     
     USERNAME_FIELD = 'email_address'
     REQUIRED_FIELDS = ['first_name', 'last_name','preferred_name','physical_id_num','dob','role','is_staff','is_superuser','photo']
@@ -30,6 +33,13 @@ class CustomUser(AbstractBaseUser):
 
     def __str__(self):
         return self.email_address
+
+    def tokens(self):
+        refresh = RefreshToken.for_user(self)
+        return {
+            'refresh:' : str(refresh),
+            'access' : str(refresh.access_token)
+        }
 
 class Class(models.Model):
     """

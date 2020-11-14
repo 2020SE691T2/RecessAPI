@@ -4,8 +4,9 @@ from rest_framework import generics, viewsets
 from rest_framework.decorators import action
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
-from RecessApplication.serializers import CustomUserSerializer, GroupSerializer, ClassSerializer, ClassEnrollmentSerializer, ClassScheduleSerializer, AssignmentSerializer
+from RecessApplication.serializers import CustomUserSerializer, GroupSerializer, ClassSerializer, ClassEnrollmentSerializer, ClassScheduleSerializer, AssignmentSerializer, CustomTokenObtainPairSerializer
 from RecessApplication.models import Class, ClassEnrollment, ClassSchedule, Assignment
+from rest_framework_simplejwt.views import TokenObtainPairView
 from .zoom import ZoomProxy
 import datetime
 
@@ -72,6 +73,9 @@ class ClassScheduleViewSet(viewsets.ModelViewSet):
     """
     queryset = Assignment.objects.all()
     serializer_class = AssignmentSerializer
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
 
 class ZoomMeetingsView(APIView):
     """
