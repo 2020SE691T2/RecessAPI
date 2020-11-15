@@ -16,24 +16,6 @@ class CustomUserSerializer(serializers.HyperlinkedModelSerializer):
         user.save()
         return user
 
-    def update(self, instance, validated_data):
-        instance.email_address = validated_data.get('email_address', instance.email_address)
-        instance.save()
-
-        instance.first_name = validated_data.get('first_name')
-        instance.last_name = validated_data.get('last_name')
-        instance.preferred_name = validated_data.get('preferred_name')
-        instance.physical_id_num = validated_data.get('physical_id_num')
-        instance.dob = validated_data.get('dob')
-        instance.role = validated_data.get('role')
-        instance.photo = validated_data.get('photo')
-        instance.is_staff = validated_data.get('is_staff')
-        instance.is_superuser = validated_data.get('is_superuser')
-
-        instance.save()
-
-        return instance
-
 class LoginUserSerializer(serializers.Serializer):
     email_address = serializers.EmailField()
     password = serializers.CharField()
