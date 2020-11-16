@@ -84,19 +84,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'RecessApplication.wsgi.application'
 
-# Database
-# https://docs.djangoproject.com/en/3.1/ref/settings/#databases
-'''
-PRODUCTION_DATABASE_URL = 'postgres://xgfkiciegnvnhv:edb5aa46c6f7ecad5c50658a44c5c65226ad4f2d84ef9959eb76cc670aba77ab@ec2-54-90-68-208.compute-1.amazonaws.com:5432/deo87b8qamkg3r'
-LOCAL_DATABASE_URL = 'postgres://postgres:password@localhost:5432/LocalRecessDB'
-
-DATABASES = {
-    # Connects to the local DB
-    'default' : dj_database_url.config(default=LOCAL_DATABASE_URL, conn_max_age=600, ssl_require=True),
-    # Connects to the production DB
-    'production' : dj_database_url.config(default=PRODUCTION_DATABASE_URL, conn_max_age=600, ssl_require=True),
-}
-'''
 PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.PBKDF2PasswordHasher',
     'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
