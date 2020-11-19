@@ -18,6 +18,7 @@ from django.urls import include, path, re_path
 from rest_framework_simplejwt import views as jwt_views
 from RecessApplication import views
 from .api import LoginAPI, RegistrationAPI
+import logging
 from .router import OptionalSlashRouter
 
 router = OptionalSlashRouter()
@@ -41,4 +42,9 @@ urlpatterns = [
     re_path(r'^zoom/meetings/?', views.ZoomMeetingsView.as_view()),
     re_path(r'^api/token/', views.CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
     re_path(r'^api/token/refresh/', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),
+    re_path(r'^zoom/meetings/(?P<pk>[0-9]+)/?$', views.ZoomMeetingsView.as_view()),
+    re_path(r'^zoom/meetings/?', views.ZoomMeetingsListView.as_view()),
 ]
+
+logger = logging.getLogger(__name__)
+logger.info("----- INITIALIZATION COMPLETE -----")

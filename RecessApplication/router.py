@@ -1,6 +1,6 @@
-from rest_framework.routers import SimpleRouter
+from rest_framework.routers import DefaultRouter
 
-class OptionalSlashRouter(SimpleRouter):
+class OptionalSlashRouter(DefaultRouter):
 
     def __init__(self):
         super().__init__()

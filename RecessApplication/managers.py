@@ -1,8 +1,11 @@
 from django.contrib.auth.base_user import BaseUserManager
 from django.utils.translation import ugettext_lazy as _
+import logging
 
 
 class CustomUserManager(BaseUserManager):
+    logger = logging.getLogger(__name__)
+
     """
     Custom user model manager where email is the unique identifiers
     for authentication instead of usernames.
@@ -12,6 +15,7 @@ class CustomUserManager(BaseUserManager):
         Create and save a User with the given email and password.
         """
         email = validated_data.pop('email_address')
+        CustomUserManager.logger.debug("Creating user for email %s", email)
         if not email:
             raise ValueError(_('The Email must be set'))
         email = self.normalize_email(email)
@@ -20,12 +24,14 @@ class CustomUserManager(BaseUserManager):
             user.is_staff = True
         user.set_password(password)
         user.save()
+        CustomUserManager.logger.info("Created user %s", user)
         return user
 
     def create_superuser(self, email, password, **extra_fields):
         """
         Create and save a Super User with the given email and password.
         """
+        CustomUserManager.logger.debug("Creating superuser for email %s", email)
         if not email:
             raise ValueError(_('The Email must be set'))
         email = self.normalize_email(email)
@@ -34,9 +40,12 @@ class CustomUserManager(BaseUserManager):
         user.is_superuser = True
         user.set_password(password)
         user.save()
+        CustomUserManager.logger.info("Created superuser %s", user)
         return user
 
 class ClassManager():
+    logger = logging.getLogger(__name__)
+
     """
     Custom class model manager where class id is the unique identifiers
     for authentication instead of usernames.
@@ -45,12 +54,15 @@ class ClassManager():
         """
         return a class.
         """
+        ClassManager.logger.debug("Getting class data for id %s", class_id)
         if not class_id:
             raise ValueError(_('The class does not exist!'))
         class_data = self.model(class_id=class_id, **extra_fields)
         return class_data
 
 class ClassEnrollmentManager():
+    logger = logging.getLogger(__name__)
+
     """
     Custom class model manager where class id is the unique identifiers
     for authentication instead of usernames.
@@ -59,12 +71,15 @@ class ClassEnrollmentManager():
         """
         return a class.
         """
+        ClassEnrollmentManager.logger.debug("Getting class enrollment data for id %s", class_id)
         if not class_id:
             raise ValueError(_('The class does not exist!'))
         class_data = self.model(class_id=class_id, **extra_fields)
         return class_data
 
 class ClassScheduleManager():
+    logger = logging.getLogger(__name__)
+
     """
     Custom class model manager where class id is the unique identifiers
     for authentication instead of usernames.
@@ -73,12 +88,15 @@ class ClassScheduleManager():
         """
         return a class.
         """
+        ClassScheduleManager.logger.debug("Getting class schedule data for id %s", class_id)
         if not class_id:
             raise ValueError(_('The class does not exist!'))
         class_data = self.model(class_id=class_id, **extra_fields)
         return class_data
 
 class AssignmentManager():
+    logger = logging.getLogger(__name__)
+
     """
     Custom assignment model manager where assignment id is the unique identifiers
     for authentication instead of usernames.
@@ -87,7 +105,8 @@ class AssignmentManager():
         """
         return a class.
         """
+        AssignmentManager.logger.debug("Getting assignment data for id %s", assignment_id)
         if not assignment_id:
             raise ValueError(_('The assignment does not exist!'))
         assignment_data = self.model(assignment_id=assignment_id, **extra_fields)
-        return assginment_data
+        return assignment_data

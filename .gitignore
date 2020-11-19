@@ -3,3 +3,4 @@ RecessApplication/__pycache__/
 venv/
 .coverage
 coverage-reports/
+logs/*.log
