@@ -3,9 +3,11 @@ from django.contrib.auth import get_user_model
 from rest_framework import generics, viewsets
 from rest_framework.decorators import action
 from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from RecessApplication.serializers import CustomUserSerializer, GroupSerializer, ClassSerializer, ClassEnrollmentSerializer, ClassScheduleSerializer, AssignmentSerializer, CustomTokenObtainPairSerializer
 from RecessApplication.models import Class, ClassEnrollment, ClassSchedule, Assignment
+from RecessApplication.permissions import IsOwner, IsSuperUser
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .zoom import ZoomProxy
 import datetime
@@ -29,6 +31,7 @@ class UserViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.
     """
+    permission_classes = (IsOwner,IsSuperUser)
     lookup_value_regex = '[^/]+'
     queryset = User.objects.all()
     serializer_class = CustomUserSerializer
@@ -60,6 +63,7 @@ class ClassEnrollmentViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows class enrollments to be viewed or edited.
     """
+    lookup_field = "class_id"
     queryset = ClassEnrollment.objects.all()
     serializer_class = ClassEnrollmentSerializer
 
