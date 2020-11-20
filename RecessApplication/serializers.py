@@ -90,8 +90,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
                     error_message = "This profile has expired"
                     error_name = "expired_profile"
                     raise exceptions.AuthenticationFailed(error_message, error_name)
-        finally:
-            return super().validate(attrs)
+        return super().validate(attrs)
 
 class GroupSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
