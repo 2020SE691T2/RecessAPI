@@ -7,7 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from RecessApplication.serializers import CustomUserSerializer, GroupSerializer, ClassSerializer, ClassEnrollmentSerializer, ClassScheduleSerializer, AssignmentSerializer, CustomTokenObtainPairSerializer
 from RecessApplication.models import Class, ClassEnrollment, ClassSchedule, Assignment
-from RecessApplication.permissions import IsOwner, IsSuperUser
+from RecessApplication.permissions import IsOwner
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .zoom import ZoomProxy
 import datetime

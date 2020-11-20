@@ -93,16 +93,7 @@ DATABASE_URL = 'postgres://xgfkiciegnvnhv:edb5aa46c6f7ecad5c50658a44c5c65226ad4f
 
 DATABASES = {
     # Connects to the production DB
-    'defaults' : dj_database_url.config(default=DATABASE_URL, conn_max_age=600, ssl_require=True),
-    # Uncomment below for local DB
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'LocalRecessDB',
-        'USER': 'postgres',
-        'PASSWORD': 'password',
-        'HOST': 'localhost',
-        'PORT': '5432',
-    }
+    'default' : dj_database_url.config(default=DATABASE_URL, conn_max_age=600, ssl_require=True),
 }
 
 
@@ -117,7 +108,6 @@ PASSWORD_HASHERS = [
 ]
 
 AUTHENTICATION_BACKENDS = [
-    #'RecessApplication.backends.UserBackend',
     'django.contrib.auth.backends.ModelBackend'
     ]
 
