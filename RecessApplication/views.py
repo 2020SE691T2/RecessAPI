@@ -31,7 +31,7 @@ class UserViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.
     """
-    permission_classes = (IsOwner,IsSuperUser)
+    permission_classes = (IsOwner,)
     lookup_value_regex = '[^/]+'
     queryset = User.objects.all()
     serializer_class = CustomUserSerializer

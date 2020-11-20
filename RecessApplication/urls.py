@@ -40,8 +40,8 @@ urlpatterns = [
     re_path(r'^api-auth/?', include('rest_framework.urls', namespace='rest_framework')),
     re_path(r'^zoom/meetings/list/?', views.ZoomMeetingsListView.as_view()),
     re_path(r'^zoom/meetings/?', views.ZoomMeetingsView.as_view()),
-    re_path(r'^api/token/', views.CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
-    re_path(r'^api/token/refresh/', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),
+    re_path(r'^api/token/new/?', views.CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
+    re_path(r'^api/token/refresh/?', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),
     re_path(r'^zoom/meetings/(?P<pk>[0-9]+)/?$', views.ZoomMeetingsView.as_view()),
     re_path(r'^zoom/meetings/?', views.ZoomMeetingsListView.as_view()),
 ]
