@@ -1,6 +1,8 @@
 RecessApplication/migrations/
 RecessApplication/__pycache__/
+RecessApplication/settings/__pycache__/
 venv/
 .coverage
 coverage-reports/
 logs/*.log
+

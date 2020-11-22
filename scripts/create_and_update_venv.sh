@@ -23,3 +23,20 @@ source ./enter_venv.sh
 cd ..
 python -m pip install --upgrade pip
 pip install -r requirements.txt
+
+# set environment variables
+database="Heroku"
+# check if database is local only (default is Heroku)
+if [[ ! -z $1 ]]; then
+    database=$1
+fi
+
+if [ ${database} = "local" ]; then
+    echo "Database: ${database}" 
+    export DJANGO_SETTINGS_MODULE=RecessApplication.local_settings
+fi
+
+if [ ${database} = "Heroku" ]; then
+    echo "Database: ${database}" 
+    export DJANGO_SETTINGS_MODULE=RecessApplication.settings
+fi

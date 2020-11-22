@@ -53,7 +53,7 @@ def get_unique_student_list(users_df: pd.DataFrame, num_students) :
         index = random.randint(0, len(users_df.index)-1)
         if (users_df.iloc[index]['role'] == "student") and (users_df.iloc[index]['email_address'] not in student_list):
             student_list += [users_df.iloc[index]['email_address']]
-    
+       
     return(student_list)
 
 def get_teacher_email(users_df: pd.DataFrame) :
@@ -62,7 +62,7 @@ def get_teacher_email(users_df: pd.DataFrame) :
     
     Parameters:
         user_df: the user database
-
+    
     Return:
         a teacher id for the class (id is from the users table)
     '''
@@ -155,45 +155,53 @@ def generate_classes_table(n: int) -> pd.DataFrame:
     df.to_csv("classes_table.csv", index=False)
     return df
 
-def generate_class_enrollment_table(users_df: pd.DataFrame, classes_df: pd.DataFrame) -> None:
+def generate_class_enrollment_table(users_df: pd.DataFrame, classes_df: pd.DataFrame, n: int) -> None:
     '''
     Generate classes table (using randomly generated data).
     
     Parameters:
         user_df: the user table
         classes_df: the classes table
+        n, the number of classes
     
     Return: None
     '''
     entries: dict = {
+        "enrollment_id": [],
         "class_id": [],
         "teacher_email": [],
         "student_email": [],
     }  
     
+    enroll_list = []
+    j = 1
     for idx, row in classes_df.iterrows():
         num_students = random.randint(12, 25)
-        teacher_id = get_teacher_email(users_df=users_df)
+        teacher_id = get_teacher_email(users_df=users_df) 
         entries["student_email"] += get_unique_student_list(users_df=users_df, num_students=num_students)
         i = 0
         while (i <= num_students):
+            entries["enrollment_id"] += [j]
             entries["class_id"] += [row["class_id"]]
             entries["teacher_email"] += [teacher_id]
             i += 1
-                
+            j += 1
+    
     df = pd.DataFrame(entries)
     df.to_csv("class_enrollment_table.csv", index=False)
 
-def generate_class_schedule_table(classes_df: pd.DataFrame) -> None:
+def generate_class_schedule_table(classes_df: pd.DataFrame, n: int) -> None:
     '''
     Generate class schedule table.
     
     Parameters:
         classes_df: the classes table
+        n, the number of classes
     
     Return: None
     '''
     entries: dict = {
+        "schedule_id": [],
         "class_id": [],
         "date": [],
         "start_time": [],
@@ -202,6 +210,7 @@ def generate_class_schedule_table(classes_df: pd.DataFrame) -> None:
     
     for idx, row in classes_df.iterrows():
         start_time = random.randint(9, 15)
+        entries["schedule_id"] = [i for i in range(1,n+1)]
         entries["class_id"] += row["class_id"],
         entries["date"] += dob_generator(), # may want to revisit
         entries["start_time"] += start_time,
@@ -242,6 +251,6 @@ def generate_assignments_table(classes_df: pd.DataFrame) -> None:
 if __name__ == "__main__":
     df_users = generate_users_table(n=100)
     df_classes = generate_classes_table(n=30)
-    generate_class_enrollment_table(users_df=df_users, classes_df=df_classes)
-    generate_class_schedule_table(classes_df=df_classes)
+    generate_class_enrollment_table(users_df=df_users, classes_df=df_classes, n=30)
+    generate_class_schedule_table(classes_df=df_classes, n=30)
     generate_assignments_table(classes_df=df_classes)

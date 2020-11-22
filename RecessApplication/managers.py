@@ -79,7 +79,7 @@ class ClassEnrollmentManager():
 
 class ClassScheduleManager():
     logger = logging.getLogger(__name__)
-
+    
     """
     Custom class model manager where class id is the unique identifiers
     for authentication instead of usernames.
