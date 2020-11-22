@@ -15,6 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path, re_path
+from rest_framework_simplejwt import views as jwt_views
 from RecessApplication import views
 from .api import LoginAPI, RegistrationAPI
 import logging
@@ -37,6 +38,8 @@ urlpatterns = [
     re_path(r'^api-auth/register/?', RegistrationAPI.as_view()),
     re_path(r'^api-auth/auth/?', LoginAPI.as_view()),
     re_path(r'^api-auth/?', include('rest_framework.urls', namespace='rest_framework')),
+    re_path(r'^api/token/new/?', views.CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
+    re_path(r'^api/token/refresh/?', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),
     re_path(r'^zoom/meetings/(?P<pk>[0-9]+)/?$', views.ZoomMeetingsView.as_view()),
     re_path(r'^zoom/meetings/?', views.ZoomMeetingsListView.as_view()),
 ]

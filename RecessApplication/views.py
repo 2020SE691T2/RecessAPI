@@ -3,9 +3,12 @@ from django.contrib.auth import get_user_model
 from rest_framework import generics, viewsets
 from rest_framework.decorators import action
 from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
-from RecessApplication.serializers import CustomUserSerializer, GroupSerializer, ClassSerializer, ClassEnrollmentSerializer, ClassScheduleSerializer, AssignmentSerializer
+from RecessApplication.serializers import CustomUserSerializer, GroupSerializer, ClassSerializer, ClassEnrollmentSerializer, ClassScheduleSerializer, AssignmentSerializer, CustomTokenObtainPairSerializer
 from RecessApplication.models import Class, ClassEnrollment, ClassSchedule, Assignment
+from RecessApplication.permissions import IsOwner
+from rest_framework_simplejwt.views import TokenObtainPairView
 from .zoom import ZoomProxy
 import datetime
 
@@ -28,6 +31,7 @@ class UserViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.
     """
+    permission_classes = (IsOwner,)
     lookup_value_regex = '[^/]+'
     queryset = User.objects.all()
     serializer_class = CustomUserSerializer
@@ -36,6 +40,10 @@ class UserViewSet(viewsets.ModelViewSet):
     """def get_queryset(self):
         email = self.kwargs["email_address"]
         return User.objects.filter(email_address=email) # return a queryset"""
+
+    def partial_update(self, request, *args, **kwargs):
+        kwargs['partial'] = True
+        return self.update(request, *args, **kwargs)
 
 class GroupViewSet(viewsets.ModelViewSet):
     """
@@ -55,6 +63,7 @@ class ClassEnrollmentViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows class enrollments to be viewed or edited.
     """
+    lookup_field = "class_id"
     queryset = ClassEnrollment.objects.all()
     serializer_class = ClassEnrollmentSerializer
 
@@ -72,6 +81,9 @@ class ClassScheduleViewSet(viewsets.ModelViewSet):
     """
     queryset = Assignment.objects.all()
     serializer_class = AssignmentSerializer
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
 
 class ZoomMeetingsView(APIView):
     """
