@@ -11,8 +11,6 @@ from RecessApplication.models import Class, ClassEnrollment, ClassSchedule, Assi
 from RecessApplication.permissions import IsOwner
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .zoom import ZoomProxy
-import logging
-import json
 
 import urllib.parse
 
@@ -60,17 +58,12 @@ class ClassViewSet(viewsets.ModelViewSet):
     """
     queryset = Class.objects.all()
     serializer_class = ClassSerializer
-    logger = logging.getLogger(__name__)
     zoom_proxy = ZoomProxy()
 
     def perform_create(self, serializer):
         instance = serializer.save()
 
-        topic = instance.class_name + "-" + instance.section
-        data = {
-            "topic": topic
-        }
-
+        data = { "topic": instance.class_name + "-" + instance.section}
         meeting_json = ClassViewSet.zoom_proxy.create_meeting(data)
         meeting = meeting_json.data
 
