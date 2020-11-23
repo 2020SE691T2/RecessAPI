@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User, Group
 from django.contrib.auth import get_user_model
-from rest_framework import generics, viewsets
+from rest_framework import generics, viewsets, status
+from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
@@ -10,7 +11,8 @@ from RecessApplication.models import Class, ClassEnrollment, ClassSchedule, Assi
 from RecessApplication.permissions import IsOwner
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .zoom import ZoomProxy
-import datetime
+import logging
+import json
 
 import urllib.parse
 
@@ -58,6 +60,21 @@ class ClassViewSet(viewsets.ModelViewSet):
     """
     queryset = Class.objects.all()
     serializer_class = ClassSerializer
+    logger = logging.getLogger(__name__)
+    zoom_proxy = ZoomProxy()
+
+    def perform_create(self, serializer):
+        instance = serializer.save()
+
+        topic = instance.class_name + "-" + instance.section
+        data = {
+            "topic": topic
+        }
+
+        meeting_json = ClassViewSet.zoom_proxy.create_meeting(data)
+        meeting = meeting_json.data
+
+        serializer.save(meeting_link=meeting["join_url"])
 
 class ClassEnrollmentViewSet(viewsets.ModelViewSet):
     """
@@ -109,12 +126,4 @@ class ZoomMeetingsListView(APIView):
         return self.proxy.list_meetings()
 
     def post(self, request, format=None):
-        topic = request.data.get('topic', None)
-        meeting_type = request.data.get('meeting_type', None)
-        start_time = request.data.get('start_time', datetime.datetime.now())
-        duration = request.data.get('duration', 60)
-        recurrence_type = request.data.get('recurrence_type', None)
-        weekly_days = request.data.get('weekly_days', None)
-        end_times = request.data.get('end_times', None)
-        end_date_time = request.data.get('end_date_time', None)
-        return self.proxy.create_meeting(topic=topic, meeting_type=meeting_type, start_time=start_time, duration=duration, recurrence_type=recurrence_type, weekly_days=weekly_days, end_times=end_times, end_date_time=end_date_time)
+        return self.proxy.create_meeting(request.data)
