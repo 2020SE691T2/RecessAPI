@@ -5,6 +5,7 @@ from django.conf import settings
 from rest_framework.response import Response
 from rest_framework import status
 from django.http import JsonResponse
+import datetime
 
 import ast
 
@@ -43,7 +44,18 @@ class ZoomProxy:
         We assume most of our meetings will be type '8' with occasional types '1' and '2'. Will populate some fields automatically based on this value.
 
     """
-    def create_meeting(self, topic, meeting_type=None, start_time=None, duration=None, recurrence_type=None, weekly_days=None, end_times=None, end_date_time=None):
+    def create_meeting(self, data):
+
+        defaults = self.set_meeting_defaults(data)
+        topic = defaults["topic"]
+        meeting_type = defaults["meeting_type"]
+        start_time = defaults["start_time"]
+        duration = defaults["duration"]
+        recurrence_type = defaults["recurrence_type"]
+        weekly_days = defaults["weekly_days"]
+        end_times = defaults["end_times"]
+        end_date_time = defaults["end_date_time"]
+
         if meeting_type == None:
             # Default to weekly recurring meeting
             meeting_type = ZoomProxy.RECURRING_MEETING_FIXED
@@ -54,7 +66,7 @@ class ZoomProxy:
             weekly_days = "2,3,4,5,6" # Monday thru Friday
         if end_times == None and end_date_time == None:
             # Can only use one or the other
-            end_times = 50 # Maximum
+            end_times = 5 # One work-week
 
         ZoomProxy.logger.info("Creating meeting for topic %s, type %s, start time %s", topic, meeting_type, start_time)
 
@@ -89,6 +101,18 @@ class ZoomProxy:
         ZoomProxy.logger.info("Create meeting response (%s): %s", meeting_create_response.status_code, content)
         
         return Response(content, status=meeting_create_response.status_code)
+
+    def set_meeting_defaults(self, data):
+        defaults = {}
+        defaults["topic"] = data.get('topic', None)
+        defaults["meeting_type"] = data.get('meeting_type', None)
+        defaults["start_time"] = data.get('start_time', datetime.datetime.now() + datetime.timedelta(days=7))
+        defaults["duration"] = data.get('duration', 60)
+        defaults["recurrence_type"] = data.get('recurrence_type', None)
+        defaults["weekly_days"] = data.get('weekly_days', None)
+        defaults["end_times"] = data.get('end_times', None)
+        defaults["end_date_time"] = data.get('end_date_time', None)
+        return defaults
 
     def delete_meeting(self, meeting_id):
 
