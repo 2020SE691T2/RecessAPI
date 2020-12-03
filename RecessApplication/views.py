@@ -11,6 +11,7 @@ from RecessApplication.models import Class, ClassEnrollment, ClassSchedule, Assi
 from RecessApplication.permissions import IsOwner
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .zoom import ZoomProxy
+import logging
 
 import urllib.parse
 
@@ -74,9 +75,17 @@ class ClassEnrollmentViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows class enrollments to be viewed or edited.
     """
-    lookup_field = "class_id"
     queryset = ClassEnrollment.objects.all()
+    filterset_fields = ('student_email',)
+    lookup_field = "enrollment_id"
     serializer_class = ClassEnrollmentSerializer
+    logger = logging.getLogger(__name__)
+
+    def get_queryset(self):
+        user = self.request.user
+        objects = ClassEnrollment.objects.filter(student_email=user.email_address)
+        ClassEnrollmentViewSet.logger.info("User: %s", user.email_address)
+        return objects
 
 class ClassScheduleViewSet(viewsets.ModelViewSet):
     """
