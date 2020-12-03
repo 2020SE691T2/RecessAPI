@@ -65,6 +65,7 @@ class ClassEnrollment(models.Model):
     """
     """
     # required and unique
+    enrollment_id = models.IntegerField(primary_key=True)
     class_id = models.CharField(max_length=100, blank=False, editable=False)
     teacher_email = models.EmailField(_('email_address')) 
     student_email = models.EmailField(_('email_address')) 
@@ -84,6 +85,7 @@ class ClassSchedule(models.Model):
     """
     """
     # required and unique
+    schedule_id = models.IntegerField(primary_key=True)
     class_id = models.CharField(max_length=100, blank=True, default='')
     date = models.DateField()
     start_time = models.TimeField()

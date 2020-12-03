@@ -5,4 +5,4 @@ from .settings import *
 
 LOCAL_DATABASE_URL = 'postgres://postgres:password@localhost:5432/LocalRecessDB'
 
-DATABASES['default'] = dj_database_url.config(default=LOCAL_DATABASE_URL, conn_max_age=600, ssl_require=True)
+DATABASES['default'] = dj_database_url.config(default=LOCAL_DATABASE_URL, conn_max_age=600, ssl_require=False)
