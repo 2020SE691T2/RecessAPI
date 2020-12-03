@@ -3,7 +3,8 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 import logging
 
-from .serializers import CustomUserSerializer, LoginUserSerializer, ClassScheduleSerializer
+from .serializers import CustomUserSerializer, LoginUserSerializer, ClassScheduleSerializer, ClassEnrollmentSerializer
+from .models import ClassEnrollment, ClassSchedule, Class
 
 class RegistrationAPI(generics.GenericAPIView):
     permission_classes = (AllowAny,)
@@ -46,11 +47,30 @@ class LoginAPI(generics.GenericAPIView):
 
 class WeeklyScheduleAPI(generics.GenericAPIView):
     logger = logging.getLogger(__name__)
+    serializer_class = ClassEnrollmentSerializer
 
     def get(self, request):
-        WeeklyScheduleAPI.logger.info("Request Info: %s", dir(self.request))
-        WeeklyScheduleAPI.logger.info("Request Auth: %s", self.request.auth)
-        WeeklyScheduleAPI.logger.info("Request User: %s", self.request.user)
+        user = request.user
+        if user.is_staff:
+            enrollments = ClassEnrollment.objects.filter(teacher_email=user.email_address).values()
+        else:
+            enrollments = ClassEnrollment.objects.filter(student_email=user.email_address).values()
+        
+        if not enrollments.exists():
+            return Response({
+                "error": "User is not enrolled in or teaching any classes."
+            })
+        
+        class_ids = [ e['class_id'] for e in enrollments ]
+        classes = Class.objects.filter(class_id__in=class_ids).values()
+        class_schedules = ClassSchedule.objects.filter(class_id__in=class_ids).values()
+
+        for cs in class_schedules:
+            class_item = next((cl for cl in classes if cl['class_id'] == cs['class_id']), {})
+            cs.update(class_item)
+            enr_item = next((enr for enr in enrollments if enr['class_id'] == cs['class_id']), {})
+            cs.update(enr_item)
+
         return Response({
-            "user": "test",
+            "schedules": class_schedules
         })
