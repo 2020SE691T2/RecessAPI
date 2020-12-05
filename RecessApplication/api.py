@@ -1,3 +1,4 @@
+from datetime import datetime
 from rest_framework import generics
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
@@ -64,6 +65,10 @@ class WeeklyScheduleAPI(generics.GenericAPIView):
         class_ids = [ e['class_id'] for e in enrollments ]
         classes = Class.objects.filter(class_id__in=class_ids).values()
         class_schedules = ClassSchedule.objects.filter(class_id__in=class_ids).values()
+        
+        for schedule in class_schedules:
+            schedule['start_time'] = datetime(schedule['date'].year, schedule['date'].month, schedule['date'].day, schedule['start_time'])
+            schedule['end_time'] = datetime(schedule['date'].year, schedule['date'].month, schedule['date'].day, schedule['end_time'])
 
         for cs in class_schedules:
             class_item = next((cl for cl in classes if cl['class_id'] == cs['class_id']), {})
