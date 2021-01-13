@@ -1,5 +1,5 @@
-from build_heroku_db import Build_DB
-from db_schema import *
+from build_heroku_db import BuildDatabase
+from db_schema import users_schema, classes_schema, class_enrollment_schema, class_schedule_schema, assignments_schema
 import pandas as pd
 import psycopg2
 
@@ -8,7 +8,7 @@ if __name__ == "__main__":
       build database tables if they don't exit
       populate these tables with data from the schema and csvs
     '''
-    recess_database = Build_DB()
+    recess_database = BuildDatebase()
     
     # create the tables
     recess_database.create_table(table="users", schema=users_schema)

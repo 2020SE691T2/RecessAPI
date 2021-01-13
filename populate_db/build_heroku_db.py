@@ -4,7 +4,7 @@ import pandas as pd
 import psycopg2
 import sys
 
-class Build_DB:
+class BuildDatabase:
     '''
     build relational database from csv file with Python and Heroku
     (https://dashboard.heroku.com/apps)

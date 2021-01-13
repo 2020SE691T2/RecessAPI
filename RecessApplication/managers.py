@@ -1,6 +1,7 @@
 from django.contrib.auth.base_user import BaseUserManager
 from django.utils.translation import ugettext_lazy as _
 import logging
+from .strcnst import ErrorMsg
 
 
 class CustomUserManager(BaseUserManager):
@@ -56,7 +57,7 @@ class ClassManager():
         """
         ClassManager.logger.debug("Getting class data for id %s", class_id)
         if not class_id:
-            raise ValueError(_('The class does not exist!'))
+            raise ValueError(_(ErrorMsg.class_dne()))
         class_data = self.model(class_id=class_id, **extra_fields)
         return class_data
 
@@ -73,7 +74,7 @@ class ClassEnrollmentManager():
         """
         ClassEnrollmentManager.logger.debug("Getting class enrollment data for id %s", class_id)
         if not class_id:
-            raise ValueError(_('The class does not exist!'))
+            raise ValueError(_(ErrorMsg.class_dne()))
         class_data = self.model(class_id=class_id, **extra_fields)
         return class_data
 
@@ -90,7 +91,7 @@ class ClassScheduleManager():
         """
         ClassScheduleManager.logger.debug("Getting class schedule data for id %s", class_id)
         if not class_id:
-            raise ValueError(_('The class does not exist!'))
+            raise ValueError(_(ErrorMsg.class_dne()))
         class_data = self.model(class_id=class_id, **extra_fields)
         return class_data
 
