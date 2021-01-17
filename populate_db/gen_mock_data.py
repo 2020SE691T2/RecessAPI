@@ -135,14 +135,14 @@ def generate_classes_table(n: int) -> pd.DataFrame:
     df_dict = {
         "class_id": [i for i in range(1,n+1)],
         "class_name": [
-            "".join(np.random.choice([i for i in string.ascii_lowercase], random.randint(5, 10))) for i in range(n)
+            "".join(np.random.choice([i for i in string.ascii_lowercase], random.randint(5, 10))) for _ in range(n)
         ],
         "meeting_link": [
-            "".join(np.random.choice([i for i in string.ascii_lowercase], random.randint(3, 10))) for i in range(n)
+            "".join(np.random.choice([i for i in string.ascii_lowercase], random.randint(3, 10))) for _ in range(n)
         ],
         "year": [str(random.randint(1960, 2020)) for i in range(n)],
         "section": [
-            "".join(np.random.choice([i for i in string.ascii_lowercase], random.randint(3, 10))) for i in range(n)
+            "".join(np.random.choice([i for i in string.ascii_lowercase], random.randint(3, 10))) for _ in range(n)
         ]
     }
     
@@ -173,7 +173,6 @@ def generate_class_enrollment_table(users_df: pd.DataFrame, classes_df: pd.DataF
         "student_email": [],
     }  
     
-    enroll_list = []
     j = 1
     for idx, row in classes_df.iterrows():
         num_students = random.randint(12, 25)
