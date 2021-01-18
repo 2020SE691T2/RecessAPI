@@ -14,10 +14,11 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import include, path, re_path
+from django.urls import include, path, re_path, include
 from rest_framework_simplejwt import views as jwt_views
 from RecessApplication import views
 from .api import LoginAPI, RegistrationAPI, WeeklyScheduleAPI
+from .views import ChangePasswordView
 import logging
 from .router import OptionalSlashRouter
 
@@ -34,6 +35,8 @@ router.register(r'assignments', views.ClassScheduleViewSet)
 # Additionally, we include login URLs for the browsable API.
 urlpatterns = [
     path('', include(router.urls)),
+    path('api/change-password/', ChangePasswordView.as_view(), name='change-password'),
+    path('api/password_reset/', include('django_rest_passwordreset.urls', namespace='password_reset')),
     re_path(r'^admin/?', admin.site.urls),
     re_path(r'^api-auth/register/?', RegistrationAPI.as_view()),
     re_path(r'^api-auth/auth/?', LoginAPI.as_view()),

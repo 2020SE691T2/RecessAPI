@@ -140,7 +140,7 @@ def generate_classes_table(n: int) -> pd.DataFrame:
         "meeting_link": [
             "".join(np.random.choice([i for i in string.ascii_lowercase], random.randint(3, 10))) for _ in range(n)
         ],
-        "year": [str(random.randint(1960, 2020)) for i in range(n)],
+        "year": [str(random.randint(1960, 2020)) for _ in range(n)],
         "section": [
             "".join(np.random.choice([i for i in string.ascii_lowercase], random.randint(3, 10))) for _ in range(n)
         ]

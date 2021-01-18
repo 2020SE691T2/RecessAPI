@@ -51,6 +51,11 @@ class LoginUserSerializer(serializers.Serializer):
             return user, user.tokens()
         raise exceptions.AuthenticationFailed(f'Unable to log in with provided credentials.')
 
+class ChangePasswordSerializer(serializers.Serializer):
+    model = User
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)
+
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
         try:
