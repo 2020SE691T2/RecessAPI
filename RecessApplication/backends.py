@@ -4,10 +4,9 @@ from django.contrib.auth.hashers import check_password
 from django.contrib.auth import get_user_model
 import logging
 
-User = get_user_model()
-
 class UserBackend(BaseBackend):    
     logger = logging.getLogger(__name__)
+    User = get_user_model()
 
     def authenticate(self, request, username=None, password=None):
         # Check the username/password and return a user, need to add check_password for authentication realistically
@@ -20,7 +19,7 @@ class UserBackend(BaseBackend):
     
     def get_user(self, email_address):
         try:
-            return User.objects.get(email_address=email_address)
-        except User.DoesNotExist:
+            return UserBackend.User.objects.get(email_address=email_address)
+        except UserBackend.User.DoesNotExist:
             UserBackend.logger.error("Could not find user for email address: %s", email_address)
             return None

@@ -105,6 +105,9 @@ class ClassViewSet(viewsets.ModelViewSet):
 
             serializer.save(meeting_link=meeting["join_url"])
 
+    def get_zoom_proxy(self):
+        return ClassViewSet.zoom_proxy
+
 class ClassEnrollmentViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows class enrollments to be viewed or edited.

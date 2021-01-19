@@ -35,6 +35,9 @@ class ZoomProxy:
             ZoomProxy.user_id = user_list['users'][0]['id']
             ZoomProxy.logger.info("Zoom User ID is %s", ZoomProxy.user_id)
 
+    def get_client(self):
+        return self.client
+
     """
     meeting_type - integer
         1 - Instant meeting
@@ -95,7 +98,7 @@ class ZoomProxy:
             else:
                 recurrence["end_times"] = end_times
 
-        meeting_create_response = self.client.meeting.create(user_id=ZoomProxy.user_id, topic=topic, type=meeting_type, start_time=start_time, duration=duration, recurrence=recurrence, settings=settings)
+        meeting_create_response = self.get_client().meeting.create(user_id=ZoomProxy.user_id, topic=topic, type=meeting_type, start_time=start_time, duration=duration, recurrence=recurrence, settings=settings)
         content = self.format_json_output(meeting_create_response.content)
 
         ZoomProxy.logger.info("Create meeting response (%s): %s", meeting_create_response.status_code, content)
@@ -120,7 +123,7 @@ class ZoomProxy:
         if (meeting_id == None):
             return Response("Must provide meeting id path parameter", status=status.HTTP_400_BAD_REQUEST)
 
-        meeting_delete_response = self.client.meeting.delete(id=meeting_id)
+        meeting_delete_response = self.get_client().meeting.delete(id=meeting_id)
         content = self.format_json_output(meeting_delete_response.content)
 
         ZoomProxy.logger.info("Delete meeting response (%s): %s", meeting_delete_response.status_code, content)
@@ -132,7 +135,7 @@ class ZoomProxy:
         if (meeting_id == None):
             return Response("Must provide meeting id path parameter", status=status.HTTP_400_BAD_REQUEST)
         show_previous_occurrences = False
-        meeting_get_response = self.client.meeting.get(user_id=ZoomProxy.user_id, id=meeting_id, occurrence_id=occurrence_id, show_previous_occurrences=show_previous_occurrences)
+        meeting_get_response = self.get_client().meeting.get(user_id=ZoomProxy.user_id, id=meeting_id, occurrence_id=occurrence_id, show_previous_occurrences=show_previous_occurrences)
         content = self.format_json_output(meeting_get_response.content)
 
         ZoomProxy.logger.info("Get meeting response (%s): %s", meeting_get_response.status_code, content)
@@ -141,7 +144,7 @@ class ZoomProxy:
 
     def list_meetings(self, meeting_type="upcoming"):
         ZoomProxy.logger.info("Getting list meeting for type %s", meeting_type)
-        meeting_list_response = self.client.meeting.list(user_id=ZoomProxy.user_id, type=meeting_type)
+        meeting_list_response = self.get_client().meeting.list(user_id=ZoomProxy.user_id, type=meeting_type)
         content = self.format_json_output(meeting_list_response.content)
 
         ZoomProxy.logger.info("Get list meeting response (%s): %s", meeting_list_response.status_code, content)

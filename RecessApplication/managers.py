@@ -1,5 +1,5 @@
 from django.contrib.auth.base_user import BaseUserManager
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 import logging
 from .strcnst import ErrorMsg
 
@@ -20,6 +20,7 @@ class CustomUserManager(BaseUserManager):
         if not email:
             raise ValueError(_('The Email must be set'))
         email = self.normalize_email(email)
+        CustomUserManager.logger.debug("Normalized email is %s", email)
         user = self.model(email_address=email, **validated_data)
         if 'is_staff' in validated_data.keys() and validated_data['is_staff'] == True:
             user.is_staff = True
@@ -28,7 +29,7 @@ class CustomUserManager(BaseUserManager):
         CustomUserManager.logger.info("Created user %s", user)
         return user
 
-    def create_superuser(self, email, password, **extra_fields):
+    def create_superuser(self, email, password, **validated_data):
         """
         Create and save a Super User with the given email and password.
         """
@@ -36,7 +37,8 @@ class CustomUserManager(BaseUserManager):
         if not email:
             raise ValueError(_('The Email must be set'))
         email = self.normalize_email(email)
-        user = self.model(email_address=email, **extra_fields)
+        CustomUserManager.logger.debug("Normalized email is %s", email)
+        user = self.model(email_address=email, **validated_data)
         user.is_staff = True
         user.is_superuser = True
         user.set_password(password)
