@@ -100,7 +100,7 @@ class ClassViewSet(viewsets.ModelViewSet):
 
         if not instance.meeting_link:
             data = { "topic": instance.class_name + "-" + instance.section}
-            meeting_json = ClassViewSet.zoom_proxy.create_meeting(data)
+            meeting_json = self.get_zoom_proxy().create_meeting(data)
             meeting = meeting_json.data
 
             serializer.save(meeting_link=meeting["join_url"])
