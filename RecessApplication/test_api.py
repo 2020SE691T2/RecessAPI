@@ -16,7 +16,7 @@ import pytest
 class TestApi:
 
     EMAIL_ADDRESS = "email@address.com"
-    PASSWORD = "secret"
+    NOT_A_PASSW0RD = "secret"
     TOKEN = "1234ABCD"
 
     def mock_registration_api(self, is_valid):
@@ -36,7 +36,7 @@ class TestApi:
     def mock_registration_data(self, is_staff=None, is_superuser=None):
         request = MockRequest()
         request.data['email_address'] = TestApi.EMAIL_ADDRESS
-        request.data['password'] = TestApi.PASSWORD
+        request.data['password'] = TestApi.NOT_A_PASSW0RD
         request.data['is_staff'] = is_staff
         request.data['is_superuser'] = is_superuser
         return request
@@ -65,7 +65,7 @@ class TestApi:
     def mock_login_data(self, is_staff=None, is_superuser=None):
         request = MockRequest()
         request.data['email_address'] = TestApi.EMAIL_ADDRESS
-        request.data['password'] = TestApi.PASSWORD
+        request.data['password'] = TestApi.NOT_A_PASSW0RD
         return request
 
     # All tests should start with 'test_'
@@ -77,20 +77,20 @@ class TestApi:
 
         registration_api = self.mock_registration_api(is_valid=True)
         registration_api.post(request=self.mock_registration_data(is_staff=is_staff, is_superuser=is_superuser))
-        self.registration_serializer.custom_save.assert_called_with(password=TestApi.PASSWORD, is_staff=is_staff, is_superuser=is_superuser)
+        self.registration_serializer.custom_save.assert_called_with(password=TestApi.NOT_A_PASSW0RD, is_staff=is_staff, is_superuser=is_superuser)
 
     def test_registration_post_success_staff(self):
         is_staff = True
 
         registration_api = self.mock_registration_api(is_valid=True)
         registration_api.post(request=self.mock_registration_data(is_staff=is_staff))
-        self.registration_serializer.custom_save.assert_called_with(password=TestApi.PASSWORD, is_staff=is_staff)
+        self.registration_serializer.custom_save.assert_called_with(password=TestApi.NOT_A_PASSW0RD, is_staff=is_staff)
 
 
     def test_registration_post_success_student(self):
         registration_api = self.mock_registration_api(is_valid=True)
         registration_api.post(request=self.mock_registration_data())
-        self.registration_serializer.custom_save.assert_called_with(password=TestApi.PASSWORD)
+        self.registration_serializer.custom_save.assert_called_with(password=TestApi.NOT_A_PASSW0RD)
 
     def test_registration_post_serializer_data_invalid(self):
         registration_api = self.mock_registration_api(is_valid=False)
