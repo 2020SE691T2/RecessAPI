@@ -34,8 +34,6 @@ ZOOM_SECRET = 'sIrBzxBLrtph5xd6GZixJ65yXpwZjtFlfdw3'
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
-#CSRF_COOKIE_SECURE = False
-#SESSION_COOKIE_SECURE = False
 
 APPEND_SLASH = False
 
@@ -146,7 +144,7 @@ STATIC_URL = '/static/'
 # REST stuff
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 10,
+    'PAGE_SIZE': 10000,
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],

@@ -38,10 +38,6 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = CustomUserSerializer
     lookup_field = "email_address"
 
-    """def get_queryset(self):
-        email = self.kwargs["email_address"]
-        return User.objects.filter(email_address=email) # return a queryset"""
-
     def partial_update(self, request, *args, **kwargs):
         kwargs['partial'] = True
         return self.update(request, *args, **kwargs)
