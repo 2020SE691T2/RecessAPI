@@ -13,10 +13,11 @@ class RegistrationAPI(generics.GenericAPIView):
     logger = logging.getLogger(__name__)
 
     def post(self, request, *args, **kwargs): # need all args for registering a user
-        RegistrationAPI.logger.info("Getting information for %s", request.data)
+        self.getLogger().info("Getting information for %s", request.data)
         serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            # Add the special fields not invluded in the CustomUser Model
+        # Don't raise exception since we're responding with an error Response
+        if serializer.is_valid(raise_exception=False):
+            # Add the special fields not included in the CustomUser Model
             special_fields = {'password': request.data['password']}
             if 'is_staff' in request.data.keys() and request.data['is_staff'] == True:
                 special_fields['is_staff'] = True
@@ -30,21 +31,27 @@ class RegistrationAPI(generics.GenericAPIView):
             "error": "The data was not valid."
         })
 
+    def getLogger(self):
+        return RegistrationAPI.logger
+
 class LoginAPI(generics.GenericAPIView):
     permission_classes = (AllowAny,)
     serializer_class = LoginUserSerializer
     logger = logging.getLogger(__name__)
 
     def post(self, request, *args, **kwargs):
-        LoginAPI.logger.info("Logging in %s", request.data)
+        self.getLogger().info("Logging in %s", request.data)
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user, tokens = serializer.validated_data
-        LoginAPI.logger.info("Logged in as user %s", user)
+        self.getLogger().info("Logged in as user %s", user)
         return Response({
             "user": CustomUserSerializer(user, context=self.get_serializer_context()).data,
             "tokens": tokens
         })
+
+    def getLogger(self):
+        return LoginAPI.logger
 
 class WeeklyScheduleAPI(generics.GenericAPIView):
     logger = logging.getLogger(__name__)

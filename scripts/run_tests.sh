@@ -9,4 +9,4 @@ if [ ! -d "logs/" ]; then
 	mkdir logs
 fi
 
-pytest --cov-report xml:coverage-reports/coverage.xml --cov=RecessApplication
+pytest --cov-report xml:coverage-reports/coverage.xml --cov=RecessApplication -s
