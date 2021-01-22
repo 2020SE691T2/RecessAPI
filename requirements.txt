@@ -20,6 +20,7 @@ mccabe==0.6.1
 psycopg2==2.8.6
 pylint==2.3.
 pycurl==7.43.0.5
+PyJWT==1.7.1
 pytest-cov==2.10.1
 pytest-django==4.1.0
 pytz==2020.1
