@@ -152,21 +152,21 @@ class TestApi:
         data = []
         max_class_id=0
         for index in range(TestApi.NUM_DAILY_CLASSES + TestApi.NUM_WEEKLY_CLASSES):
-            next = {}
-            next['enrollment_id'] = index + 10
-            next['class_id'] = index
-            next['student_email'] = "student@email.fake"
-            next['teacher_email'] = "teacher@email.fake"
-            data.append(next)
+            item = {}
+            item['enrollment_id'] = index + 10
+            item['class_id'] = index
+            item['student_email'] = "student@email.fake"
+            item['teacher_email'] = "teacher@email.fake"
+            data.append(item)
         max_class_id = TestApi.NUM_DAILY_CLASSES + TestApi.NUM_WEEKLY_CLASSES
 
         for index in range(TestApi.NUM_DAILY_CLASSES):
-            next = {}
-            next['enrollment_id'] = max_class_id + index + 10
-            next['class_id'] = max_class_id + index
-            next['student_email'] = "student@email.fake"
-            next['teacher_email'] = "teacher@email.fake"
-            data.append(next)
+            item = {}
+            item['enrollment_id'] = max_class_id + index + 10
+            item['class_id'] = max_class_id + index
+            item['student_email'] = "student@email.fake"
+            item['teacher_email'] = "teacher@email.fake"
+            data.append(item)
 
         queryset = QuerySet()
         result.filter = MagicMock(return_value=queryset)
@@ -185,25 +185,25 @@ class TestApi:
         max_class_id=0
         # Make a 'class' for each class designated
         for index in range(TestApi.NUM_DAILY_CLASSES + TestApi.NUM_WEEKLY_CLASSES):
-            next = {}
-            next['class_id'] = index
-            next['class_name'] = "Class " + str(index)
-            next['meeting_link'] = "https://www.google.fake"
-            next['section'] = "fake"
-            next['year'] = TestApi.SCHEDULED_YEAR
-            data.append(next)
+            item = {}
+            item['class_id'] = index
+            item['class_name'] = "Class " + str(index)
+            item['meeting_link'] = "https://www.google.fake"
+            item['section'] = "fake"
+            item['year'] = TestApi.SCHEDULED_YEAR
+            data.append(item)
             max_class_id=index
         max_class_id = max_class_id + 1
 
         # Make a 'class' for each daily designated class for previous year
         for index in range(TestApi.NUM_DAILY_CLASSES):
-            next = {}
-            next['class_id'] = index + max_class_id
-            next['class_name'] = "Class " + str(index + max_class_id)
-            next['meeting_link'] = "https://www.google.fake"
-            next['section'] = "fake"
-            next['year'] = TestApi.EARLY_YEAR
-            data.append(next)
+            item = {}
+            item['class_id'] = index + max_class_id
+            item['class_name'] = "Class " + str(index + max_class_id)
+            item['meeting_link'] = "https://www.google.fake"
+            item['section'] = "fake"
+            item['year'] = TestApi.EARLY_YEAR
+            data.append(item)
 
         queryset = QuerySet()
         result.filter = MagicMock(return_value=queryset)
@@ -222,13 +222,13 @@ class TestApi:
             start_hour = (6 + index*2) % 20
             stop_hour = start_hour+1
 
-            next = {}
-            next['class_id'] = index
-            next['schedule_id'] = index + 20
-            next['weekday'] = index % 5
-            next['start_time'] = str(datetime.time(hour=start_hour, minute=0, second=0))
-            next['end_time'] = str(datetime.time(hour=stop_hour, minute=0, second=0))
-            data.append(next)
+            item = {}
+            item['class_id'] = index
+            item['schedule_id'] = index + 20
+            item['weekday'] = index % 5
+            item['start_time'] = str(datetime.time(hour=start_hour, minute=0, second=0))
+            item['end_time'] = str(datetime.time(hour=stop_hour, minute=0, second=0))
+            data.append(item)
             max_previous = index
         max_previous = max_previous + 1
 
@@ -238,13 +238,13 @@ class TestApi:
             start_hour = (6 + daily_index*2) % 20
             stop_hour = start_hour+1
 
-            next = {}
-            next['class_id'] = daily_index
-            next['schedule_id'] = daily_index + 20
-            next['weekday'] = -1
-            next['start_time'] = str(datetime.time(hour=start_hour, minute=0, second=0))
-            next['end_time'] = str(datetime.time(hour=stop_hour, minute=0, second=0))
-            data.append(next)
+            item = {}
+            item['class_id'] = daily_index
+            item['schedule_id'] = daily_index + 20
+            item['weekday'] = -1
+            item['start_time'] = str(datetime.time(hour=start_hour, minute=0, second=0))
+            item['end_time'] = str(datetime.time(hour=stop_hour, minute=0, second=0))
+            data.append(item)
         max_previous = max_previous + TestApi.NUM_DAILY_CLASSES
 
         # Make a 'class' for each daily designated class for previous year
@@ -253,13 +253,13 @@ class TestApi:
             start_hour = (6 + daily_index*2) % 20
             stop_hour = start_hour+1
 
-            next = {}
-            next['class_id'] = daily_index
-            next['schedule_id'] = daily_index + 20
-            next['weekday'] = -1
-            next['start_time'] = str(datetime.time(hour=start_hour, minute=0, second=0))
-            next['end_time'] = str(datetime.time(hour=stop_hour, minute=0, second=0))
-            data.append(next)
+            item = {}
+            item['class_id'] = daily_index
+            item['schedule_id'] = daily_index + 20
+            item['weekday'] = -1
+            item['start_time'] = str(datetime.time(hour=start_hour, minute=0, second=0))
+            item['end_time'] = str(datetime.time(hour=stop_hour, minute=0, second=0))
+            data.append(item)
 
         queryset = QuerySet()
         result.filter = MagicMock(return_value=queryset)
