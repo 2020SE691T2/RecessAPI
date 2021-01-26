@@ -24,7 +24,6 @@ class MockWeeklyScheduleAPI(WeeklyScheduleAPI):
 class TestApi:
 
     EMAIL_ADDRESS = "email@address.com"
-    EMAIL_ADDRESS = "fake@address.com"
     NOT_A_PASSW0RD = "secret"
     TOKEN = "1234ABCD"
     NUM_DAILY_CLASSES=1
@@ -230,36 +229,23 @@ class TestApi:
             item['end_time'] = str(datetime.time(hour=stop_hour, minute=0, second=0))
             data.append(item)
             max_previous = index
-        max_previous = max_previous + 1
 
         # Make a 'class' for each class designated (daily)
-        for index in range(TestApi.NUM_DAILY_CLASSES):
-            daily_index = index + max_previous
-            start_hour = (6 + daily_index*2) % 20
-            stop_hour = start_hour+1
+        # Then make a 'class' for each daily designated class for previous year
+        for index in range(2):
+            for index in range(TestApi.NUM_DAILY_CLASSES):
+                max_previous = max_previous + 1
+                daily_index = index + max_previous
+                start_hour = (6 + daily_index*2) % 20
+                stop_hour = start_hour+1
 
-            item = {}
-            item['class_id'] = daily_index
-            item['schedule_id'] = daily_index + 20
-            item['weekday'] = -1
-            item['start_time'] = str(datetime.time(hour=start_hour, minute=0, second=0))
-            item['end_time'] = str(datetime.time(hour=stop_hour, minute=0, second=0))
-            data.append(item)
-        max_previous = max_previous + TestApi.NUM_DAILY_CLASSES
-
-        # Make a 'class' for each daily designated class for previous year
-        for index in range(TestApi.NUM_DAILY_CLASSES):
-            daily_index = index + max_previous
-            start_hour = (6 + daily_index*2) % 20
-            stop_hour = start_hour+1
-
-            item = {}
-            item['class_id'] = daily_index
-            item['schedule_id'] = daily_index + 20
-            item['weekday'] = -1
-            item['start_time'] = str(datetime.time(hour=start_hour, minute=0, second=0))
-            item['end_time'] = str(datetime.time(hour=stop_hour, minute=0, second=0))
-            data.append(item)
+                item = {}
+                item['class_id'] = daily_index
+                item['schedule_id'] = daily_index + 20
+                item['weekday'] = -1
+                item['start_time'] = str(datetime.time(hour=start_hour, minute=0, second=0))
+                item['end_time'] = str(datetime.time(hour=stop_hour, minute=0, second=0))
+                data.append(item)
 
         queryset = QuerySet()
         result.filter = MagicMock(return_value=queryset)
