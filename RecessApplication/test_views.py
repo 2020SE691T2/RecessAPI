@@ -47,6 +47,7 @@ class TestViews:
         _class = Class()
         if exists:
             _class.meeting_link = TestViews.JOIN_URL
+            _class.super_link = TestViews.START_URL
         return _class
 
     def mock_zoomproxy(self):

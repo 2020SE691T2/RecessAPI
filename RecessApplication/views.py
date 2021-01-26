@@ -94,15 +94,12 @@ class ClassViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         instance = serializer.save()
 
-        if not instance.meeting_link:
+        if not instance.meeting_link or not instance.super_link:
             data = { "topic": instance.class_name + "-" + instance.section}
             meeting_json = self.get_zoom_proxy().create_meeting(data)
             meeting = meeting_json.data
 
-            serializer.save(meeting_link=meeting["join_url"])
-
-    def get_zoom_proxy(self):
-        return ClassViewSet.zoom_proxy
+            serializer.save(meeting_link=meeting["join_url"], super_link=meeting["start_url"])
 
 class ClassEnrollmentViewSet(viewsets.ModelViewSet):
     """

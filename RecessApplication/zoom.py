@@ -150,7 +150,7 @@ class ZoomProxy:
         ZoomProxy.logger.info("Get list meeting response (%s): %s", meeting_list_response.status_code, content)
         
         return Response(content, status=meeting_list_response.status_code)
-
+    
     # Convert byte string to json dictionary for proper API display and formatting
     def format_json_output(self, byte_string):
         dict_str = byte_string.decode("UTF-8")
