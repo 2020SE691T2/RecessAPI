@@ -71,8 +71,16 @@ class WeeklyScheduleAPI(generics.GenericAPIView):
                 "error": "User is not enrolled in or teaching any classes."
             })
         
-        year = request.data['year']
-        week = request.data['week']
+        if not (request.GET.get("year")) :     
+            year = datetime.today().isocalendar()[0] # return tuple (year, week number, weekday)
+        else:
+            year = int(request.GET.get("year")) # https://stackoverflow.com/questions/3711349/django-and-query-string-parameters
+        
+        if not (request.GET.get("week")) :
+            week = datetime.today().isocalendar()[1]
+        else:
+            week = int(request.GET.get("week"))
+        
         if week >= 30:
             class_year = year
         else:
