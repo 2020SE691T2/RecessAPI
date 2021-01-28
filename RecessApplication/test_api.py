@@ -130,11 +130,17 @@ class TestApi:
             login_api.post(request=self.mock_login_data())
 
     # WeeklyScheduleAPI
-    def mock_schedule_request(self, year, week, is_staff=True):
+    def mock_schedule_request(self, year, week, is_staff=True, has_year=True, has_week=True):
         request = MockRequest()
         request.user.is_staff = is_staff
-        request.data['year'] = year
-        request.data['week'] = week
+
+        data = {}
+        if has_year:
+            data['year'] = year
+        if has_week:
+            data['week'] = week
+        request.GET.set(data)
+
         return request
 
     def mock_schedule_api(self, has_enrollments=True):
