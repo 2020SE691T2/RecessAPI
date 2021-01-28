@@ -1,9 +1,11 @@
+import faker
+import numpy as np
 import pandas as pd
 import uuid
 import random
 import string
-import numpy as np
-import faker
+import time
+from datetime import datetime, timedelta, time
 
 def get_photos():
     """
@@ -24,7 +26,7 @@ def dob_generator():
        dob in the form "mm/dd/yyyy"
     """
     month = random.randint(1, 12)
-    year = random.randint(1960, 2020)
+    year = random.randint(2012, 2024)
     if (month == 2):
         if (year % 4 == 0):
             day = random.randint(1, 29)
@@ -140,7 +142,10 @@ def generate_classes_table(n: int) -> pd.DataFrame:
         "meeting_link": [
             "".join(np.random.choice([i for i in string.ascii_lowercase], random.randint(3, 10))) for _ in range(n)
         ],
-        "year": [str(random.randint(1960, 2020)) for _ in range(n)],
+        "super_link": [
+            "".join(np.random.choice([i for i in string.ascii_lowercase], random.randint(3, 10))) for _ in range(n)
+        ],
+        "year": [str(random.randint(2020, 2022)) for _ in range(n)],
         "section": [
             "".join(np.random.choice([i for i in string.ascii_lowercase], random.randint(3, 10))) for _ in range(n)
         ]
@@ -148,6 +153,10 @@ def generate_classes_table(n: int) -> pd.DataFrame:
     
     df_dict["meeting_link"] = [
         f"https://{class_name}.com"
+        for class_name in df_dict["class_name"]
+    ]
+    df_dict["super_link"] = [
+        f"https://{class_name}_super.com"
         for class_name in df_dict["class_name"]
     ]
     
@@ -202,7 +211,7 @@ def generate_class_schedule_table(classes_df: pd.DataFrame, n: int) -> None:
     entries: dict = {
         "schedule_id": [],
         "class_id": [],
-        "date": [],
+        "weekday": [],
         "start_time": [],
         "end_time": [],
     }  
@@ -211,9 +220,9 @@ def generate_class_schedule_table(classes_df: pd.DataFrame, n: int) -> None:
         start_time = random.randint(9, 15)
         entries["schedule_id"] = [i for i in range(1,n+1)]
         entries["class_id"] += row["class_id"],
-        entries["date"] += dob_generator(), # may want to revisit
-        entries["start_time"] += start_time,
-        entries["end_time"] += start_time+1,
+        entries["weekday"] += random.randint(0, 4), # 0 = Monday, 4 = Friday
+        entries["start_time"] += time(hour=start_time),
+        entries["end_time"] += time(hour=start_time+1),
     
     df = pd.DataFrame(entries)
     df.to_csv("class_schedule_table.csv", index=False)

@@ -1,5 +1,6 @@
 from django.contrib.auth.base_user import BaseUserManager
 from django.utils.translation import gettext_lazy as _
+from django.db import models
 import logging
 from .strcnst import ErrorMsg
 
@@ -46,7 +47,7 @@ class CustomUserManager(BaseUserManager):
         CustomUserManager.logger.info("Created superuser %s", user)
         return user
 
-class ClassManager():
+class ClassManager(models.Manager):
     logger = logging.getLogger(__name__)
 
     """
@@ -63,7 +64,7 @@ class ClassManager():
         class_data = self.model(class_id=class_id, **extra_fields)
         return class_data
 
-class ClassEnrollmentManager():
+class ClassEnrollmentManager(models.Manager):
     logger = logging.getLogger(__name__)
 
     """
@@ -80,7 +81,7 @@ class ClassEnrollmentManager():
         class_data = self.model(class_id=class_id, **extra_fields)
         return class_data
 
-class ClassScheduleManager():
+class ClassScheduleManager(models.Manager):
     logger = logging.getLogger(__name__)
     
     """
@@ -97,7 +98,7 @@ class ClassScheduleManager():
         class_data = self.model(class_id=class_id, **extra_fields)
         return class_data
 
-class AssignmentManager():
+class AssignmentManager(models.Manager):
     logger = logging.getLogger(__name__)
 
     """

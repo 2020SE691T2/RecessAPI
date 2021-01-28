@@ -3,6 +3,7 @@ from rest_framework import generics
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 import logging
+import copy
 
 from .serializers import CustomUserSerializer, LoginUserSerializer, ClassScheduleSerializer, ClassEnrollmentSerializer
 from .models import ClassEnrollment, ClassSchedule, Class
@@ -56,33 +57,77 @@ class LoginAPI(generics.GenericAPIView):
 class WeeklyScheduleAPI(generics.GenericAPIView):
     logger = logging.getLogger(__name__)
     serializer_class = ClassEnrollmentSerializer
-
+    
     def get(self, request):
         user = request.user
+
         if user.is_staff:
-            enrollments = ClassEnrollment.objects.filter(teacher_email=user.email_address).values()
+            enrollments = self.getClassEnrollments().filter(teacher_email=user.email_address).values()
         else:
-            enrollments = ClassEnrollment.objects.filter(student_email=user.email_address).values()
-        
-        if not enrollments.exists():
+            enrollments = self.getClassEnrollments().filter(student_email=user.email_address).values()
+
+        if not self.exists(enrollments):
             return Response({
                 "error": "User is not enrolled in or teaching any classes."
             })
         
-        class_ids = [ e['class_id'] for e in enrollments ]
-        classes = Class.objects.filter(class_id__in=class_ids).values()
-        class_schedules = ClassSchedule.objects.filter(class_id__in=class_ids).values()
+        if not (request.GET.get("year")) :     
+            year = datetime.today().isocalendar()[0] # return tuple (year, week number, weekday)
+        else:
+            year = int(request.GET.get("year")) # https://stackoverflow.com/questions/3711349/django-and-query-string-parameters
         
-        for schedule in class_schedules:
-            schedule['start_time'] = datetime(schedule['date'].year, schedule['date'].month, schedule['date'].day, schedule['start_time'])
-            schedule['end_time'] = datetime(schedule['date'].year, schedule['date'].month, schedule['date'].day, schedule['end_time'])
+        if not (request.GET.get("week")) :
+            week = datetime.today().isocalendar()[1]
+        else:
+            week = int(request.GET.get("week"))
+        
+        if week >= 30:
+            class_year = year
+        else:
+            class_year = year - 1
+        
+        class_ids = [ e['class_id'] for e in enrollments ]
+        classes = self.getClasses().filter(class_id__in=class_ids, year=class_year).values()
 
-        for cs in class_schedules:
-            class_item = next((cl for cl in classes if cl['class_id'] == cs['class_id']), {})
-            cs.update(class_item)
-            enr_item = next((enr for enr in enrollments if enr['class_id'] == cs['class_id']), {})
-            cs.update(enr_item)
+        result = []
+        if self.exists(classes):
+            class_schedules = self.getClassSchedules().filter(class_id__in=class_ids).values()    
+            
+            for cs in class_schedules:
+                class_item = next((cl for cl in classes if cl['class_id'] == cs['class_id']), {})
+                if (not class_item) or (class_item['year'] != class_year): continue
+                cs.update(class_item)
+                enr_item = next((enr for enr in enrollments if enr['class_id'] == cs['class_id']), {})
+                cs.update(enr_item)
+                for day in self.get_weekday_name(int(cs['weekday'])):
+                    cs['weekday'] = day
+                    new_cs = copy.deepcopy(cs)       
+                    result.append(new_cs)
 
         return Response({
-            "schedules": class_schedules
+            "schedules": result
         })
+    
+    def get_weekday_name(self, nday):
+        result = []
+        wdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
+        if (nday == -1):
+            result = wdays
+        else:
+            result.append(wdays[nday])
+        return result
+
+    def getClassEnrollments(self):
+        return ClassEnrollment.objects
+
+    def getClasses(self):
+        return Class.objects
+
+    def getClassSchedules(self):
+        return ClassSchedule.objects
+
+    def getLogger(self):
+        return WeeklyScheduleAPI.logger
+
+    def exists(self, obj):
+        return obj.exists()
