@@ -1,3 +1,4 @@
+import requests
 from django.contrib.auth.models import AbstractBaseUser
 from django.utils.translation import gettext_lazy as _
 from django.db import models
@@ -12,18 +13,15 @@ from .managers import CustomUserManager, ClassManager, ClassEnrollmentManager, C
 @receiver(reset_password_token_created)
 def password_reset_token_created(sender, instance, reset_password_token, *args, **kwargs):
 
-    email_plaintext_message = "{}?token={}".format(reverse('password_reset:reset-password-request'), reset_password_token.key)
+    email_plaintext_message = "Password Reset Token: {}".format(reset_password_token.key)
 
-    send_mail(
-        # title:
-        "Password Reset for {title}".format(title="Some website title"),
-        # message:
-        email_plaintext_message,
-        # from:
-        "noreply@somehost.local",
-        # to:
-        [reset_password_token.user.email_address]
-    )
+    requests.post(
+		"https://api.mailgun.net/v3/sandbox95a40589397a44f78c650f4f17c9897f.mailgun.org/messages",
+		auth=("api", "e7d82d7bcc956224d65fd3ee51978db6-77751bfc-7cdd392f"),
+		data={"from": "Recess Application Support <mailgun@sandbox95a40589397a44f78c650f4f17c9897f.mailgun.org>",
+			"to": [reset_password_token.user.email_address],
+			"subject": "Password Reset for Recess Application",
+			"text": email_plaintext_message})
 
 class CustomUser(AbstractBaseUser):
     last_login = None
