@@ -24,6 +24,7 @@ class RegistrationAPI(generics.GenericAPIView):
             user = serializer.custom_save( **special_fields )
             return Response({
                 "user": CustomUserSerializer(user, context=self.get_serializer_context()).data,
+                "tokens": user.tokens()
             })
         return Response({
             "error": "The data was not valid."
