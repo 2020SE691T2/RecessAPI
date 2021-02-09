@@ -64,7 +64,7 @@ In pgAdmin, Create a new Server.
 
 In the terminal, run
 ```console
-source ./create_and_update_venv.sh
+source ./create_and_update_venv.sh local
 ```
 
 **NOTE:** may require
@@ -77,14 +77,14 @@ prior to running.
 
 In the terminal, run
 ```console
-source ./create_and_update_venv.sh Heroku
+source ./create_and_update_venv.sh
 ```
 
 **NOTE:** may require
 ```console
 chmod u+x ./create_and_update_venv.sh
 ```
-prior to running. "Heroku" is case sensitive.
+prior to running.
 
 ## Build Database and Populate Tables
 ```console

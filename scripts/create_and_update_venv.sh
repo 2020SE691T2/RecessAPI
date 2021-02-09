@@ -31,12 +31,14 @@ if [[ ! -z $1 ]]; then
     database=$1
 fi
 
-if [ ${database} = "local" ]; then
-    echo "Database: ${database}" 
-    export DJANGO_SETTINGS_MODULE=RecessApplication.local_settings
+echo "Database: ${database}" 
+if [ ${database} = "local" ]; then    
+    export DBURL=$(awk -F "=" '/^database_local=/ {print $2}' envvars.txt)
 fi
 
 if [ ${database} = "Heroku" ]; then
-    echo "Database: ${database}" 
-    export DJANGO_SETTINGS_MODULE=RecessApplication.settings
+    export DBURL=$(awk -F "=" '/^database_heroku=/ {print $2}' envvars.txt)
 fi
+export DJANGO_SETTINGS_MODULE=RecessApplication.settings
+
+echo "Database URL: ${DBURL}"

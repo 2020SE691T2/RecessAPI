@@ -47,5 +47,8 @@ else
     fi
 fi
 
+echo "Database: ${database}" 
+echo "Database URI: ${database_uri}"
+
 export database_uri
 export database_type

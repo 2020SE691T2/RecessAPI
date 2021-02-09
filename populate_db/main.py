@@ -8,7 +8,7 @@ if __name__ == "__main__":
       build database tables if they don't exit
       populate these tables with data from the schema and csvs
     '''
-    recess_database = BuildDatebase()
+    recess_database = BuildDatabase()
     
     # create the tables
     recess_database.create_table(table="users", schema=users_schema)

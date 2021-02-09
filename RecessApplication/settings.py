@@ -87,14 +87,9 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'RecessApplication.wsgi.application'
 
-# Database
-# https://docs.djangoproject.com/en/3.1/ref/settings/#databases
-
-PRODUCTION_DATABASE_URL = 'postgres://xgfkiciegnvnhv:edb5aa46c6f7ecad5c50658a44c5c65226ad4f2d84ef9959eb76cc670aba77ab@ec2-54-90-68-208.compute-1.amazonaws.com:5432/deo87b8qamkg3r'
-
 DATABASES = {
-    # Connects to the production DB
-    'default' : dj_database_url.config(default=PRODUCTION_DATABASE_URL, conn_max_age=600, ssl_require=True),
+    # Connects to the provided environment DB URL
+    'default' : dj_database_url.config(default=os.environ['DBURL'], conn_max_age=600, ssl_require=True),
 }
 
 PASSWORD_HASHERS = [
@@ -138,12 +133,10 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
-
 
 # REST stuff
 REST_FRAMEWORK = {
@@ -188,9 +181,11 @@ SIMPLE_JWT = {
 CORS_ALLOWED_ORIGINS = [
     "https://recess-prototype.herokuapp.com",
     "http://localhost:3000",
+    "http://localhost:3001",
     "http://localhost:8080",
     "http://127.0.0.1:3000",
-    "http://127.0.0.1:8080"
+    "http://127.0.0.1:8080",
+    "http://127.0.0.1:3001"
 ]
 
 # Activate Django-Heroku.
