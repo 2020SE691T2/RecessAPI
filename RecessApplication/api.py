@@ -1,12 +1,81 @@
 from datetime import datetime
+from django.db.models import Max
 from rest_framework import generics
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, BasePermission, IsAuthenticated
+from .permissions import IsStaffPermission
 from rest_framework.response import Response
 import logging
 import copy
+from .zoom import ZoomProxy
+from datetime import time
 
-from .serializers import CustomUserSerializer, LoginUserSerializer, ClassScheduleSerializer, ClassEnrollmentSerializer
+from .serializers import CustomUserSerializer, LoginUserSerializer, ClassSerializer, ClassScheduleSerializer, ClassEnrollmentSerializer
 from .models import ClassEnrollment, ClassSchedule, Class
+
+class CreateEventAPI(generics.GenericAPIView):
+    permission_classes = (IsStaffPermission, )
+    logger = logging.getLogger(__name__)
+    zoom_proxy = ZoomProxy()
+    
+    def convertDatetime(self, time_obj):        
+        return datetime.fromisoformat('2021-01-01T' + time_obj + ':00').time()
+
+    def getNextClassId(self):
+        '''
+        return the 'next' id from ids of type class_id in the database
+        '''
+        return Class.objects.all().aggregate(Max('class_id'))['class_id__max'] + 1
+    
+    def getNextScheduleId(self):
+        '''
+        return the 'next' id from ids of type schedule_id in the database
+        '''
+        return ClassSchedule.objects.all().aggregate(Max('schedule_id'))['schedule_id__max'] + 1
+    
+    def post(self, request, *args, **kwargs):
+        next_class_id = self.getNextClassId()
+        class_data = self.saveClass(request.data, next_class_id)
+        class_schedules = self.saveClassSchedule(request.data, next_class_id)
+        if not (class_data and class_schedules):
+            return Response({
+                "error": "The data was not valid."
+            })
+        return Response({
+                "class_id": next_class_id
+            })
+    
+    def saveClass(self, data, next_class_id):
+        args = {
+                'class_id' : next_class_id,
+                'class_name' : data['class_name'],
+                'year' : data['year'],
+                'section' : data.get('section',1)
+                }
+        serializer = ClassSerializer(data=args)
+        if serializer.is_valid(raise_exception=True):
+            cl = serializer.save()
+            return cl
+        return False
+    
+    def saveClassSchedule(self, data, next_class_id):
+        cl = []
+        for day in data['days']:
+            args = {
+                    'class_id' : next_class_id,
+                    'schedule_id' : self.getNextScheduleId(),
+                    'weekday' : day,
+                    'start_time' : self.convertDatetime(data['start']),
+                    'end_time' : self.convertDatetime(data['end'])
+                    }
+            serializer = ClassScheduleSerializer(data=args)
+            if serializer.is_valid(raise_exception=True):
+                cl.append(serializer.save())
+            else:
+                return False
+        return cl
+
+    def getLogger(self):
+        return CreateEventAPI.logger
 
 class RegistrationAPI(generics.GenericAPIView):
     permission_classes = (AllowAny,)
@@ -123,7 +192,7 @@ class WeeklyScheduleAPI(generics.GenericAPIView):
 
     def getClasses(self):
         return Class.objects
-
+    
     def getClassSchedules(self):
         return ClassSchedule.objects
 

@@ -244,7 +244,7 @@ def generate_assignments_table(classes_df: pd.DataFrame) -> None:
         "due_date": [],
         "class_id": [],
     }
-
+    
     for idx, row in classes_df.iterrows():        
         entries["assignment_id"] += random.randint(0, 10000),
         entries["name"] += ["".join(np.random.choice([i for i in string.ascii_lowercase], random.randint(5, 10)))]

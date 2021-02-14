@@ -97,7 +97,7 @@ class ClassEnrollmentSerializer(serializers.HyperlinkedModelSerializer):
 class ClassScheduleSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = ClassSchedule
-        fields = ['class_id', 'date', 'start_time', 'end_time']
+        fields = ['class_id', 'schedule_id', 'weekday', 'start_time', 'end_time']
 
 class AssignmentSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:

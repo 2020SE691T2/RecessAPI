@@ -17,7 +17,7 @@ from django.contrib import admin
 from django.urls import include, path, re_path, include
 from rest_framework_simplejwt import views as jwt_views
 from RecessApplication import views
-from .api import LoginAPI, RegistrationAPI, WeeklyScheduleAPI
+from .api import CreateEventAPI, LoginAPI, RegistrationAPI, WeeklyScheduleAPI
 from .views import ChangePasswordView
 import logging
 from .router import OptionalSlashRouter
@@ -42,6 +42,7 @@ urlpatterns = [
     re_path(r'^api-auth/auth/?', LoginAPI.as_view()),
     re_path(r'^api-auth/?', include('rest_framework.urls', namespace='rest_framework')),
     re_path(r'^api/classes/?', WeeklyScheduleAPI.as_view()),
+    re_path(r'^api/create-class/?', CreateEventAPI.as_view()),
     re_path(r'^api/token/new/?', views.CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
     re_path(r'^api/token/refresh/?', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),
     re_path(r'^zoom/meetings/(?P<pk>[0-9]+)/?$', views.ZoomMeetingsView.as_view()),
