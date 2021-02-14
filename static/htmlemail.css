@@ -84,7 +84,7 @@
   .footer a {
     color: #999;
   }
-  .footer p, .footer a, .footer unsubscribe, .footer td {
+  .footer p, .footer a, .footer .unsubscribe, .footer td {
     font-size: 12px;
   }
   
