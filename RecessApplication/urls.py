@@ -29,7 +29,8 @@ router.register(r'groups', views.GroupViewSet)
 router.register(r'class_info', views.ClassViewSet)
 router.register(r'class_enrollment', views.ClassEnrollmentViewSet)
 router.register(r'class_schedule', views.ClassScheduleViewSet)
-router.register(r'assignments', views.ClassScheduleViewSet)
+router.register(r'assignments', views.AssignmentViewSet)
+router.register(r'roster', views.RosterViewSet)
 
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.
@@ -47,6 +48,7 @@ urlpatterns = [
     re_path(r'^api/token/refresh/?', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),
     re_path(r'^zoom/meetings/(?P<pk>[0-9]+)/?$', views.ZoomMeetingsView.as_view()),
     re_path(r'^zoom/meetings/?', views.ZoomMeetingsListView.as_view()),
+    re_path(r'^api/participants/?', views.StudentTeacherViewSet.as_view())
 ]
 
 logger = logging.getLogger(__name__)

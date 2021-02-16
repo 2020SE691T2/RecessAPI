@@ -9,7 +9,7 @@ from django.urls import reverse
 from django_rest_passwordreset.signals import reset_password_token_created
 from django.core.mail import send_mail  
 from rest_framework_simplejwt.tokens import RefreshToken
-from .managers import CustomUserManager, ClassManager, ClassEnrollmentManager, ClassScheduleManager, AssignmentManager
+from .managers import CustomUserManager, ClassManager, ClassEnrollmentManager, ClassScheduleManager, AssignmentManager, ClassRosterManager, ClassRosterParticipantManager
 
 @receiver(reset_password_token_created)
 def password_reset_token_created(sender, instance, reset_password_token, *args, **kwargs):
@@ -84,11 +84,10 @@ class ClassEnrollment(models.Model):
     # required and unique
     enrollment_id = models.IntegerField(primary_key=True)
     class_id = models.CharField(max_length=100, blank=False, editable=False)
-    teacher_email = models.EmailField(_('email_address')) 
-    student_email = models.EmailField(_('email_address')) 
+    roster_id = models.IntegerField()
 
-    CLASSNAME_FIELD = 'class_id'
-    REQUIRED_FIELDS = ['teacher_email', 'student_email']
+    CLASSNAME_FIELD = 'enrollment_id'
+    REQUIRED_FIELDS = ['class_id', 'roster_id']
     
     objects = ClassEnrollmentManager()
     
@@ -97,6 +96,39 @@ class ClassEnrollment(models.Model):
     
     def __str__(self):
         return str(self.class_id)
+
+class ClassRoster(models.Model):
+    """
+    """
+    roster_id = models.IntegerField(primary_key=True)
+    roster_name = models.CharField(max_length=100, blank=False, editable=False)
+
+    CLASSNAME_FIELD = 'roster_id'
+    REQUIRED_FIELDS = ['roster_name']
+    
+    objects = ClassRosterManager()
+    
+    class Meta:
+        db_table = 'class_roster'
+    
+    def __str__(self):
+        return str(self.roster_id)
+
+class ClassRosterParticipant(models.Model):
+    roster_id = models.ForeignKey(ClassRoster, related_name='roster', on_delete=models.CASCADE)
+    email_address = models.EmailField(_('email_address'))
+
+    CLASSNAME_FIELD = 'roster_id'
+    REQUIRED_FIELDS = ['email_address']
+    
+    objects = ClassRosterParticipantManager()
+    
+    class Meta:
+        unique_together = ['roster_id', 'email_address']
+        db_table = 'class_roster_participant'
+    
+    def __str__(self):
+        return str(self.roster_id) + " " + self.email_address
 
 class ClassSchedule(models.Model):
     """

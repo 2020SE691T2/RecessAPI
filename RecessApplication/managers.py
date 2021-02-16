@@ -51,8 +51,7 @@ class ClassManager(models.Manager):
     logger = logging.getLogger(__name__)
 
     """
-    Custom class model manager where class id is the unique identifiers
-    for authentication instead of usernames.
+    Custom class model manager where class id is the unique identifier.
     """
     def get_class_data(self, class_id, **extra_fields):
         """
@@ -68,8 +67,7 @@ class ClassEnrollmentManager(models.Manager):
     logger = logging.getLogger(__name__)
 
     """
-    Custom class model manager where class id is the unique identifiers
-    for authentication instead of usernames.
+    Custom class model manager where enrollment id is the unique identifier.
     """
     def get_class_enrollment_data(self, class_id, **extra_fields):
         """
@@ -85,8 +83,7 @@ class ClassScheduleManager(models.Manager):
     logger = logging.getLogger(__name__)
     
     """
-    Custom class model manager where class id is the unique identifiers
-    for authentication instead of usernames.
+    Custom class model manager where class id is the unique identifier.
     """
     def get_class_schedule_data(self, class_id, **extra_fields):
         """
@@ -102,8 +99,7 @@ class AssignmentManager(models.Manager):
     logger = logging.getLogger(__name__)
 
     """
-    Custom assignment model manager where assignment id is the unique identifiers
-    for authentication instead of usernames.
+    Custom assignment model manager where assignment id is the unique identifier.
     """
     def get_assignment_schedule_data(self, assignment_id, **extra_fields):
         """
@@ -114,3 +110,35 @@ class AssignmentManager(models.Manager):
             raise ValueError(_('The assignment does not exist!'))
         assignment_data = self.model(assignment_id=assignment_id, **extra_fields)
         return assignment_data
+
+class ClassRosterManager(models.Manager):
+    logger = logging.getLogger(__name__)
+
+    """
+    Custom class roster model manager where roster id is the unique identifier.
+    """
+    def get_roster_data(self, roster_id, **extra_fields):
+        """
+        return a class.
+        """
+        ClassRosterManager.logger.debug("Getting roster data for id %s", roster_id)
+        if not roster_id:
+            raise ValueError(_('The roster does not exist!'))
+        roster_data = self.model(roster_id=roster_id, **extra_fields)
+        return roster_data
+
+class ClassRosterParticipantManager(models.Manager):
+    logger = logging.getLogger(__name__)
+
+    """
+    Custom class roster participant model manager where roster id and email address is the unique identifier.
+    """
+    def get_roster_participant_data(self, roster_id, email_address, **extra_fields):
+        """
+        return a class.
+        """
+        ClassRosterParticipantManager.logger.debug("Getting assignment data for id %s %s", roster_id, email_address)
+        if not roster_id or not email_address:
+            raise ValueError(_('The roster participant does not exist!'))
+        roster_participant_data = self.model(roster_id=roster_id, email_address=email_address, **extra_fields)
+        return roster_participant_data

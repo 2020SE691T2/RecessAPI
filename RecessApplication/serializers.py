@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import serializers, exceptions
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from RecessApplication.models import CustomUser, Class, ClassEnrollment, ClassSchedule, Assignment
+from RecessApplication.models import CustomUser, Class, ClassEnrollment, ClassSchedule, Assignment, ClassRoster, ClassRosterParticipant
 from django.contrib.auth import authenticate
 
 class CustomUserSerializer(serializers.HyperlinkedModelSerializer):
@@ -92,7 +92,7 @@ class ClassSerializer(serializers.HyperlinkedModelSerializer):
 class ClassEnrollmentSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = ClassEnrollment
-        fields = ['class_id', 'teacher_email', 'student_email']
+        fields = ['enrollment_id', 'class_id', 'roster_id']
 
 class ClassScheduleSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
@@ -103,3 +103,15 @@ class AssignmentSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Assignment
         fields = ['assignment_id', 'name', 'description', 'assigned_date', 'due_date', 'class_id']
+
+class ClassRosterSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = ClassRoster
+        fields = ['roster_id', 'roster_name']
+
+class ClassRosterParticipantSerializer(serializers.HyperlinkedModelSerializer):
+    roster_id = ClassRosterSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = ClassRosterParticipant
+        fields = ['roster_id', 'email_address']

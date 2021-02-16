@@ -6,12 +6,13 @@ from rest_framework.decorators import action
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
-from RecessApplication.serializers import CustomUserSerializer, GroupSerializer, ClassSerializer, ClassEnrollmentSerializer, ClassScheduleSerializer, AssignmentSerializer, CustomTokenObtainPairSerializer, ChangePasswordSerializer
-from RecessApplication.models import Class, ClassEnrollment, ClassSchedule, Assignment
+from RecessApplication.serializers import CustomUserSerializer, GroupSerializer, ClassSerializer, ClassEnrollmentSerializer, ClassScheduleSerializer, AssignmentSerializer, CustomTokenObtainPairSerializer, ChangePasswordSerializer, ClassRosterSerializer
+from RecessApplication.models import Class, ClassEnrollment, ClassSchedule, Assignment, CustomUser, ClassRoster, ClassRosterParticipant
 from RecessApplication.permissions import IsOwner
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .zoom import ZoomProxy
 import logging
+import json
 
 import urllib.parse
 
@@ -109,15 +110,33 @@ class ClassEnrollmentViewSet(viewsets.ModelViewSet):
     API endpoint that allows class enrollments to be viewed or edited.
     """
     queryset = ClassEnrollment.objects.all()
-    filterset_fields = ('student_email',)
     lookup_field = "enrollment_id"
     serializer_class = ClassEnrollmentSerializer
     logger = logging.getLogger(__name__)
 
     def get_queryset(self):
         user = self.request.user
-        objects = ClassEnrollment.objects.filter(student_email=user.email_address)
+        rosterParticipants = ClassRosterParticipant.objects.filter(email_address=user.email_address)
+        roster_ids = []
+        for participant in rosterParticipants:
+            roster_ids.append(participant.roster_id)
+        objects = ClassEnrollment.objects.filter(roster_id__in=user.email_address)
         ClassEnrollmentViewSet.logger.info("User: %s", user.email_address)
+        return objects
+
+class RosterViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows rosters to be viewed or edited.
+    """
+    queryset = ClassRoster.objects.all()
+    lookup_field = "roster_id"
+    serializer_class = ClassRosterSerializer
+    logger = logging.getLogger(__name__)
+
+    def get_queryset(self):
+        roster_id = self.request.roster_id
+        objects = ClassRoster.objects.filter(roster_id=roster_id)
+        RosterViewSet.logger.info("Roster: %s", roster_id)
         return objects
 
 class ClassScheduleViewSet(viewsets.ModelViewSet):
@@ -128,7 +147,7 @@ class ClassScheduleViewSet(viewsets.ModelViewSet):
     serializer_class = ClassScheduleSerializer
 
 
-class ClassScheduleViewSet(viewsets.ModelViewSet):
+class AssignmentViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows class schedules to be viewed or edited.
     """
@@ -137,6 +156,45 @@ class ClassScheduleViewSet(viewsets.ModelViewSet):
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
+
+class StudentTeacherViewSet(APIView):
+    """
+    Returns all teachers and students in separate lists
+    """
+
+    def get(self, format=None):
+        users = self.get_all_users()
+
+        teachers = []
+        students = []
+
+        for user in users:
+            if user.is_staff:
+                teachers.append(self.encode_user(user))
+            elif not user.is_staff:
+                students.append(self.encode_user(user))
+
+        data = {}
+        data['teachers'] = teachers
+        data['students'] = students
+
+        response = {
+            'status': 'success',
+            'code': status.HTTP_200_OK,
+            'data': json.dumps(data)
+        }
+
+        return Response(response)
+
+    def encode_user(self, user):
+        data = {}
+        data["emailaddress"] = user.email_address
+        data["firstname"] = user.first_name
+        data["lastname"] = user.last_name
+        return data
+
+    def get_all_users(self):
+        return CustomUser.objects.all()
 
 class ZoomMeetingsView(APIView):
     """
