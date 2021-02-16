@@ -22,8 +22,10 @@ SECTION VARCHAR
 """
 
 class_roster_participant_schema = """
-ROSTER_ID INTEGER PRIMARY KEY,
-EMAIL_ADDRESS VARCHAR NOT NULL
+ROSTER_ID INTEGER,
+EMAIL_ADDRESS VARCHAR,
+PRIMARY KEY(ROSTER_ID, EMAIL_ADDRESS),
+CONSTRAINT fk_roster FOREIGN KEY(roster_id) REFERENCES class_roster(roster_id)
 """
 
 class_roster_schema = """
@@ -34,7 +36,8 @@ ROSTER_NAME VARCHAR NOT NULL
 class_enrollment_schema = """
 ENROLLMENT_ID INTEGER PRIMARY KEY,
 CLASS_ID INTEGER NOT NULL,
-ROSTER_ID INTEGER NOT NULL
+ROSTER_ID INTEGER NOT NULL,
+CONSTRAINT fk_roster FOREIGN KEY(roster_id) REFERENCES class_roster(roster_id)
 """
 
 class_schedule_schema = """
