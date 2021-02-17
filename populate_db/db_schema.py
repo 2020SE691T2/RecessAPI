@@ -22,9 +22,9 @@ SECTION VARCHAR
 """
 
 class_roster_participant_schema = """
+PARTICIPANT_ID INTEGER PRIMARY KEY,
 ROSTER_ID INTEGER,
 EMAIL_ADDRESS VARCHAR,
-PRIMARY KEY(ROSTER_ID, EMAIL_ADDRESS),
 CONSTRAINT fk_roster FOREIGN KEY(roster_id) REFERENCES class_roster(roster_id)
 """
 
