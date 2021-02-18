@@ -15,7 +15,6 @@ from .models import ClassEnrollment, ClassSchedule, Class
 class CreateEventAPI(generics.GenericAPIView):
     permission_classes = (IsStaffPermission, )
     logger = logging.getLogger(__name__)
-    zoom_proxy = ZoomProxy()
     
     def convertDatetime(self, time_obj):        
         return datetime.fromisoformat('2021-01-01T' + time_obj + ':00').time()
@@ -45,17 +44,34 @@ class CreateEventAPI(generics.GenericAPIView):
             })
     
     def saveClass(self, data, next_class_id):
-        args = {
+        # TODO: add zoom proxy here
+        zoom_proxy = ZoomProxy()
+        cl = []
+        for day in data['days']:
+            zoom_data = {
+                'topic': data['class_name'],
+                'meeting_type': 8,
+                'start_time': self.convertDatetime(data['start']),
+                'end_time' : self.convertDatetime(data['end']),
+                'duration': data['end'] - data['start'],
+                'weekly_days': day + 2
+            }
+            meeting_json = self.get_zoom_proxy().create_meeting(data)
+            meeting = meeting_json.data
+            args = {
                 'class_id' : next_class_id,
                 'class_name' : data['class_name'],
                 'year' : data['year'],
-                'section' : data.get('section',1)
-                }
-        serializer = ClassSerializer(data=args)
-        if serializer.is_valid(raise_exception=True):
-            cl = serializer.save()
-            return cl
-        return False
+                'section' : data.get('section',1),
+                'meeting_link' : meeting["join_url"],
+                'super_link' : meeting["start_url"]                
+            }
+            serializer = ClassSerializer(data=args)
+            if serializer.is_valid(raise_exception=False):
+                cl.append(serializer.save())
+            else:
+                return False
+        return cl
     
     def saveClassSchedule(self, data, next_class_id):
         cl = []
@@ -68,7 +84,7 @@ class CreateEventAPI(generics.GenericAPIView):
                     'end_time' : self.convertDatetime(data['end'])
                     }
             serializer = ClassScheduleSerializer(data=args)
-            if serializer.is_valid(raise_exception=True):
+            if serializer.is_valid(raise_exception=False):
                 cl.append(serializer.save())
             else:
                 return False

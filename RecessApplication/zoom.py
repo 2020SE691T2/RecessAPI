@@ -56,7 +56,7 @@ class ZoomProxy:
         duration = defaults["duration"]
         recurrence_type = defaults["recurrence_type"]
         weekly_days = defaults["weekly_days"]
-        end_times = defaults["end_times"]
+        end_time = defaults["end_time"]
         end_date_time = defaults["end_date_time"]
 
         if meeting_type == None:
@@ -67,9 +67,9 @@ class ZoomProxy:
         if weekly_days == None:
             # Default to M-F
             weekly_days = "2,3,4,5,6" # Monday thru Friday
-        if end_times == None and end_date_time == None:
+        if end_time == None and end_date_time == None:
             # Can only use one or the other
-            end_times = 5 # One work-week
+            end_time = 5 # One work-week
 
         ZoomProxy.logger.info("Creating meeting for topic %s, type %s, start time %s", topic, meeting_type, start_time)
 
@@ -96,7 +96,7 @@ class ZoomProxy:
             if end_date_time:
                 recurrence["end_date_time"] = end_date_time
             else:
-                recurrence["end_times"] = end_times
+                recurrence["end_time"] = end_time
 
         meeting_create_response = self.get_client().meeting.create(user_id=ZoomProxy.user_id, topic=topic, type=meeting_type, start_time=start_time, duration=duration, recurrence=recurrence, settings=settings)
         content = self.format_json_output(meeting_create_response.content)
@@ -113,7 +113,7 @@ class ZoomProxy:
         defaults["duration"] = data.get('duration', 60)
         defaults["recurrence_type"] = data.get('recurrence_type', None)
         defaults["weekly_days"] = data.get('weekly_days', None)
-        defaults["end_times"] = data.get('end_times', None)
+        defaults["end_time"] = data.get('end_time', None)
         defaults["end_date_time"] = data.get('end_date_time', None)
         return defaults
 
