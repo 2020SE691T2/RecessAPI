@@ -164,34 +164,33 @@ def generate_classes_table(n: int) -> pd.DataFrame:
     df.to_csv("classes_table.csv", index=False)
     return df
 
-def generate_class_enrollment_table(users_df: pd.DataFrame, classes_df: pd.DataFrame, n: int) -> None:
+def generate_class_enrollment_table(users_df: pd.DataFrame, classes_df: pd.DataFrame, roster_df: pd.DataFrame) -> None:
     '''
     Generate classes table (using randomly generated data).
     
     Parameters:
         user_df: the user table
         classes_df: the classes table
-        n, the number of classes
+        roster_df, the class roster table
     
     Return: None
     '''
     entries: dict = {
         "enrollment_id": [],
         "class_id": [],
-        "teacher_email": [],
-        "student_email": [],
+        "roster_id": []
     }  
     
     j = 1
     for idx, row in classes_df.iterrows():
         num_students = random.randint(12, 25)
-        teacher_id = get_teacher_email(users_df=users_df) 
-        entries["student_email"] += get_unique_student_list(users_df=users_df, num_students=num_students)
+        
         i = 0
         while (i <= num_students):
             entries["enrollment_id"] += [j]
             entries["class_id"] += [row["class_id"]]
-            entries["teacher_email"] += [teacher_id]
+            index = random.randint(0,roster_df.shape[0] - 1)
+            entries["roster_id"] += [roster_df.iloc[index]['roster_id']]
             i += 1
             j += 1
     
@@ -256,9 +255,67 @@ def generate_assignments_table(classes_df: pd.DataFrame) -> None:
     df = pd.DataFrame(entries)
     df.to_csv("assignments_table.csv", index=False)
 
+def generate_class_roster_table() -> None:
+    '''
+    Generate class roster table.
+    The roster id is unique to itself. Each roster will have at least 1 (possibly more) teachers and some number of students (see participants table).
+    Multiple classes, such as science, math and english, could all use the same roster id (this is typical in early education)
+    
+    Parameters:
+        n: the number of roster ids to generate
+    
+    Return: the class roster table
+    '''    
+    entries: dict = {
+        "roster_id": [],
+        "roster_name": []
+    }
+    
+    entries["roster_id"] = 1,
+    entries["roster_name"] = "roster"
+    
+    df = pd.DataFrame(entries)
+    df.to_csv("class_roster_table.csv", index=False)
+    return df
+    
+def generate_class_roster_participant_table(users_df: pd.DataFrame, roster_df: pd.DataFrame) -> None:
+    '''
+    Generate class roster participant table.
+    
+    Parameters:
+        user_df, the users table
+        roster_df: the class roster table
+    
+    Return: None
+    '''    
+    entries: dict = {
+        "roster_id": [],
+        "participant_id": [],
+        "email_address": []
+    }
+    
+    for idx, row in roster_df.iterrows():
+        # add teacher to a class
+        entries["email_address"] += [get_teacher_email(users_df=users_df)]
+        entries["participant_id"] += [1]
+        entries["roster_id"] += [row["roster_id"]]
+        # populate class roster with students
+        num_students = random.randint(12, 25)
+        entries["email_address"] += get_unique_student_list(users_df=users_df, num_students=num_students-1)
+        for i in range(0, num_students):
+            entries["participant_id"] += [(i+2)]
+            entries["roster_id"] += [row["roster_id"]]
+    
+    df = pd.DataFrame(entries)
+    df.to_csv("class_roster_participant_table.csv", index=False)
+
 if __name__ == "__main__":
+
     df_users = generate_users_table(n=100)
     df_classes = generate_classes_table(n=30)
-    generate_class_enrollment_table(users_df=df_users, classes_df=df_classes, n=30)
+    df_roster = generate_class_roster_table() # chose half the number of classes 
+    
+    generate_class_enrollment_table(users_df=df_users, classes_df=df_classes, roster_df=df_roster)
     generate_class_schedule_table(classes_df=df_classes, n=30)
     generate_assignments_table(classes_df=df_classes)
+    generate_class_roster_participant_table(users_df=df_users, roster_df=df_roster)
