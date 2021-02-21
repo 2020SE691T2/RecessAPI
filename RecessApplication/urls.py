@@ -15,6 +15,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path, re_path, include
+from django.conf import settings
+from django.conf.urls.static import static
 from rest_framework_simplejwt import views as jwt_views
 from RecessApplication import views
 from .api import CreateEventAPI, LoginAPI, RegistrationAPI, WeeklyScheduleAPI
@@ -49,9 +51,8 @@ urlpatterns = [
     re_path(r'^api/token/refresh/?', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),
     re_path(r'^zoom/meetings/(?P<pk>[0-9]+)/?$', views.ZoomMeetingsView.as_view()),
     re_path(r'^zoom/meetings/?', views.ZoomMeetingsListView.as_view()),
-    re_path(r'^api/participants/?', views.StudentTeacherViewSet.as_view())
+    re_path(r'^api/participants/?', views.StudentTeacherViewSet.as_view()),
     static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-]
 
 logger = logging.getLogger(__name__)
 logger.info("----- INITIALIZATION COMPLETE -----")
