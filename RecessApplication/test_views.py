@@ -1,9 +1,10 @@
 from unittest.mock import MagicMock, ANY
 from .models import CustomUser, Class
 from .serializers import ClassSerializer
-from .views import UserViewSet, ClassViewSet, ZoomMeetingsView, ZoomMeetingsListView
+from .views import UserViewSet, ClassViewSet, ZoomMeetingsView, ZoomMeetingsListView, StudentTeacherViewSet
 from .test_utilities import MockRequest
 from .zoom import ZoomProxy
+import json
 
 # All test files should start with 'test_'
 # Standard convention is test_<name of thing being tested>
@@ -13,6 +14,8 @@ class TestViews:
 
     JOIN_URL = "JOIN_URI"
     START_URL = "START_URI"
+    NUM_TEACHERS = 2
+    NUM_STUDENTS = 5
 
     def mock_userviewset(self):
         user_viewset = UserViewSet()
@@ -61,6 +64,32 @@ class TestViews:
         response.data["start_url"] = TestViews.START_URL
         return response
 
+    def mock_student_teacher_view(self):
+        student_teacher_view = StudentTeacherViewSet()
+        student_teacher_view.get_all_users = MagicMock(return_value=self.mock_get_students_teachers())
+        return student_teacher_view
+
+    def mock_get_students_teachers(self):
+        users = []
+
+        for index in range(TestViews.NUM_STUDENTS):
+            student = CustomUser()
+            student.role = 'Student'
+            student.email_address = 'student@email.com'
+            student.first_name = "Little"
+            student.last_name = "Student" + str(index)
+            users.append(student)
+
+        for index in range(TestViews.NUM_TEACHERS):
+            teacher = CustomUser()
+            teacher.role = 'Teacher'
+            teacher.email_address = 'teacher@email.com'
+            teacher.first_name = "Mr./Mrs."
+            teacher.last_name = "Teacher" + str(index)
+            users.append(teacher)
+
+        return users
+
     # All tests should start with 'test_'
 
     def test_userviewset_partial_success(self):
@@ -88,3 +117,9 @@ class TestViews:
         zoom_meetings_list_view = self.mock_zoommeetings_listview()
         assert zoom_meetings_list_view.proxy != None
 
+    def test_studentteacher_view_get(self):
+        student_teacher_view = self.mock_student_teacher_view()
+        result = student_teacher_view.get()
+        data = json.loads(result.data['data'])
+        assert len(data["teachers"]) == TestViews.NUM_TEACHERS
+        assert len(data["students"]) == TestViews.NUM_STUDENTS

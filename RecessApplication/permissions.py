@@ -3,7 +3,7 @@ import logging
 
 class IsOwner(BasePermission):
     logger = logging.getLogger(__name__)
-
+    
     def has_object_permission(self, request, view, obj):
         IsOwner.logger.info('IsOwner Request User: %s', request.user)
         IsOwner.logger.info('IsOwner View: %s', view)
@@ -13,6 +13,15 @@ class IsOwner(BasePermission):
 class IsSuperUser(BasePermission):
     # To be implemented later
     logger = logging.getLogger(__name__)
-
+    
     def has_object_permission(self, request, view, obj):
         return False
+
+class IsStaffPermission(BasePermission):
+    """
+    Custom permission class for staff and superusers
+    """
+    
+    def has_object_permssion(self, request):
+        return request.user.is_staff
+

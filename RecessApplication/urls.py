@@ -19,7 +19,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from rest_framework_simplejwt import views as jwt_views
 from RecessApplication import views
-from .api import LoginAPI, RegistrationAPI, WeeklyScheduleAPI
+from .api import CreateEventAPI, LoginAPI, RegistrationAPI, WeeklyScheduleAPI
 from .views import ChangePasswordView
 import logging
 from .router import OptionalSlashRouter
@@ -31,7 +31,9 @@ router.register(r'groups', views.GroupViewSet)
 router.register(r'class_info', views.ClassViewSet)
 router.register(r'class_enrollment', views.ClassEnrollmentViewSet)
 router.register(r'class_schedule', views.ClassScheduleViewSet)
-router.register(r'assignments', views.ClassScheduleViewSet)
+router.register(r'assignments', views.AssignmentViewSet)
+router.register(r'roster', views.RosterViewSet)
+router.register(r'roster_participant', views.RosterParticipantViewSet)
 
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.
@@ -44,11 +46,13 @@ urlpatterns = [
     re_path(r'^api-auth/auth/?', LoginAPI.as_view()),
     re_path(r'^api-auth/?', include('rest_framework.urls', namespace='rest_framework')),
     re_path(r'^api/classes/?', WeeklyScheduleAPI.as_view()),
+    re_path(r'^api/create-class/?', CreateEventAPI.as_view()),
     re_path(r'^api/token/new/?', views.CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
     re_path(r'^api/token/refresh/?', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),
     re_path(r'^zoom/meetings/(?P<pk>[0-9]+)/?$', views.ZoomMeetingsView.as_view()),
     re_path(r'^zoom/meetings/?', views.ZoomMeetingsListView.as_view()),
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    re_path(r'^api/participants/?', views.StudentTeacherViewSet.as_view()),
+    static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 logger = logging.getLogger(__name__)
 logger.info("----- INITIALIZATION COMPLETE -----")
