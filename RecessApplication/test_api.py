@@ -1,6 +1,6 @@
 from unittest.mock import MagicMock, patch
 from .api import RegistrationAPI, LoginAPI, WeeklyScheduleAPI
-from .managers import ClassEnrollmentManager, ClassManager, ClassScheduleManager
+from .managers import ClassEnrollmentManager, ClassManager, ClassScheduleManager, ClassRosterParticipantManager
 from .models import CustomUser, ClassEnrollment, Class, ClassSchedule
 from .serializers import CustomUserSerializer, LoginUserSerializer
 from .test_utilities import TestLogger, MockRequest
@@ -145,11 +145,28 @@ class TestApi:
 
     def mock_schedule_api(self, has_enrollments=True):
         schedule_api = MockWeeklyScheduleAPI()
+        schedule_api.getRosterParticipants = MagicMock(return_value=self.mock_roster_data())
         schedule_api.getClassEnrollments = MagicMock(return_value=self.mock_enrollment_data(has_enrollments))
         schedule_api.getClasses = MagicMock(return_value=self.mock_class_data())
         schedule_api.getClassSchedules = MagicMock(return_value=self.mock_class_schedule_data())
         schedule_api.enrollments_exists = MagicMock()
         return schedule_api
+
+    def mock_roster_data(self):
+        result = ClassRosterParticipantManager()
+
+        data = []
+        for index in range(TestApi.NUM_DAILY_CLASSES + TestApi.NUM_WEEKLY_CLASSES):
+            item = {}
+            item['roster_id'] = 1
+            item['participant_id'] = index
+            data.append(item)
+
+        queryset = QuerySet()
+        result.filter = MagicMock(return_value=queryset)
+        queryset.values = MagicMock(return_value=data)
+
+        return result
 
     def mock_enrollment_data(self, has_enrollments):
         result = ClassEnrollmentManager()
@@ -160,8 +177,7 @@ class TestApi:
             item = {}
             item['enrollment_id'] = index + 10
             item['class_id'] = index
-            item['student_email'] = "student@email.fake"
-            item['teacher_email'] = "teacher@email.fake"
+            item['roster_id'] = 1
             data.append(item)
         max_class_id = TestApi.NUM_DAILY_CLASSES + TestApi.NUM_WEEKLY_CLASSES
 
@@ -169,8 +185,7 @@ class TestApi:
             item = {}
             item['enrollment_id'] = max_class_id + index + 10
             item['class_id'] = max_class_id + index
-            item['student_email'] = "student@email.fake"
-            item['teacher_email'] = "teacher@email.fake"
+            item['roster_id'] = 1
             data.append(item)
 
         queryset = QuerySet()
