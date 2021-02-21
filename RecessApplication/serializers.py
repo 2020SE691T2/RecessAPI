@@ -3,6 +3,7 @@ from rest_framework import serializers, exceptions
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from RecessApplication.models import CustomUser, Class, ClassEnrollment, ClassSchedule, Assignment, ClassRoster, ClassRosterParticipant
 from django.contrib.auth import authenticate
+from django.db.models import Max
 
 class CustomUserSerializer(serializers.HyperlinkedModelSerializer):
 
@@ -13,6 +14,7 @@ class CustomUserSerializer(serializers.HyperlinkedModelSerializer):
         write_only_fields = ['password']
 
     def create(self, validated_data):
+        print(validated_data)
         return CustomUser.objects.create_user(validated_data.pop('password'), **validated_data)
 
     def create_superuser(self, validated_data):
@@ -104,14 +106,34 @@ class AssignmentSerializer(serializers.HyperlinkedModelSerializer):
         model = Assignment
         fields = ['assignment_id', 'name', 'description', 'assigned_date', 'due_date', 'class_id']
 
-class ClassRosterSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = ClassRoster
-        fields = ['roster_id', 'roster_name']
-
-class ClassRosterParticipantSerializer(serializers.HyperlinkedModelSerializer):
-    roster_id = ClassRosterSerializer(many=True, read_only=True)
+class ClassRosterParticipantSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ClassRosterParticipant
         fields = ['roster_id', 'email_address']
+
+class ClassRosterSerializer(serializers.ModelSerializer):
+    participants = ClassRosterParticipantSerializer(many=True)
+
+    class Meta:
+        model = ClassRoster
+        fields = ['roster_id', 'roster_name', 'participants']
+        read_only_fields = ['roster_id']
+
+    def create(self, validated_data):
+        participants_data = validated_data.pop('participants')
+        roster_id = ClassRoster.objects.aggregate(Max('roster_id'))['roster_id__max']
+
+        if roster_id is None:
+            roster_id = 0
+        roster_id = roster_id + 1
+
+        roster = ClassRoster.objects.create(roster_id=roster_id, **validated_data)
+        participant_id = ClassRosterParticipant.objects.aggregate(Max('participant_id'))['participant_id__max']
+        if participant_id is None:
+            participant_id = 0
+
+        for participant in participants_data:
+            participant_id = participant_id + 1
+            ClassRosterParticipant.objects.create(participant_id=participant_id, roster_id=roster_id, **participant)
+        return roster

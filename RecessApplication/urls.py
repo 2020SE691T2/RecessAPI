@@ -31,6 +31,7 @@ router.register(r'class_enrollment', views.ClassEnrollmentViewSet)
 router.register(r'class_schedule', views.ClassScheduleViewSet)
 router.register(r'assignments', views.AssignmentViewSet)
 router.register(r'roster', views.RosterViewSet)
+router.register(r'roster_participant', views.RosterParticipantViewSet)
 
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.

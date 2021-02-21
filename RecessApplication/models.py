@@ -101,7 +101,7 @@ class ClassRoster(models.Model):
     """
     """
     roster_id = models.IntegerField(primary_key=True)
-    roster_name = models.CharField(max_length=100, blank=False, editable=False)
+    roster_name = models.CharField(max_length=100, blank=False, default='')
 
     CLASSNAME_FIELD = 'roster_id'
     REQUIRED_FIELDS = ['roster_name']
@@ -115,16 +115,17 @@ class ClassRoster(models.Model):
         return str(self.roster_id)
 
 class ClassRosterParticipant(models.Model):
-    roster_id = models.ForeignKey(ClassRoster, related_name='roster', on_delete=models.CASCADE)
+    participant_id = models.IntegerField(primary_key=True)
+    roster = models.ForeignKey(ClassRoster, related_name='participants', on_delete=models.CASCADE)
     email_address = models.EmailField(_('email_address'))
 
-    CLASSNAME_FIELD = 'roster_id'
-    REQUIRED_FIELDS = ['email_address']
+    CLASSNAME_FIELD = 'participant_id'
+    REQUIRED_FIELDS = ['roster', 'email_address']
     
     objects = ClassRosterParticipantManager()
     
     class Meta:
-        unique_together = ['roster_id', 'email_address']
+        unique_together = ['roster', 'email_address']
         db_table = 'class_roster_participant'
     
     def __str__(self):

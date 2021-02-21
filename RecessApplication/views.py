@@ -6,7 +6,7 @@ from rest_framework.decorators import action
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
-from RecessApplication.serializers import CustomUserSerializer, GroupSerializer, ClassSerializer, ClassEnrollmentSerializer, ClassScheduleSerializer, AssignmentSerializer, CustomTokenObtainPairSerializer, ChangePasswordSerializer, ClassRosterSerializer
+from RecessApplication.serializers import CustomUserSerializer, GroupSerializer, ClassSerializer, ClassEnrollmentSerializer, ClassScheduleSerializer, AssignmentSerializer, CustomTokenObtainPairSerializer, ChangePasswordSerializer, ClassRosterSerializer, ClassRosterParticipantSerializer
 from RecessApplication.models import Class, ClassEnrollment, ClassSchedule, Assignment, CustomUser, ClassRoster, ClassRosterParticipant
 from RecessApplication.permissions import IsOwner
 from rest_framework_simplejwt.views import TokenObtainPairView
@@ -129,15 +129,22 @@ class RosterViewSet(viewsets.ModelViewSet):
     API endpoint that allows rosters to be viewed or edited.
     """
     queryset = ClassRoster.objects.all()
-    lookup_field = "roster_id"
     serializer_class = ClassRosterSerializer
     logger = logging.getLogger(__name__)
 
-    def get_queryset(self):
-        roster_id = self.request.roster_id
-        objects = ClassRoster.objects.filter(roster_id=roster_id)
-        RosterViewSet.logger.info("Roster: %s", roster_id)
-        return objects
+#    def get_queryset(self):
+#        roster_id = self.request.roster_id
+#        objects = ClassRoster.objects.filter(roster_id=roster_id)
+#        RosterViewSet.logger.info("Roster: %s", roster_id)
+#        return objects
+
+class RosterParticipantViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows rosters to be viewed or edited.
+    """
+    queryset = ClassRosterParticipant.objects.all()
+    serializer_class = ClassRosterParticipantSerializer
+    logger = logging.getLogger(__name__)
 
 class ClassScheduleViewSet(viewsets.ModelViewSet):
     """
@@ -169,9 +176,9 @@ class StudentTeacherViewSet(APIView):
         students = []
 
         for user in users:
-            if user.is_staff:
+            if user.role.lower() == 'teacher':
                 teachers.append(self.encode_user(user))
-            elif not user.is_staff:
+            elif user.role.lower() == 'student':
                 students.append(self.encode_user(user))
 
         data = {}
