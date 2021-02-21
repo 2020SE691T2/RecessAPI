@@ -50,6 +50,7 @@ urlpatterns = [
     re_path(r'^zoom/meetings/(?P<pk>[0-9]+)/?$', views.ZoomMeetingsView.as_view()),
     re_path(r'^zoom/meetings/?', views.ZoomMeetingsListView.as_view()),
     re_path(r'^api/participants/?', views.StudentTeacherViewSet.as_view())
+    static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 ]
 
 logger = logging.getLogger(__name__)
