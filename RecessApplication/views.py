@@ -116,9 +116,9 @@ class ClassEnrollmentViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        rosterParticipants = ClassRosterParticipant.objects.filter(email_address=user.email_address)
+        roster_participants = ClassRosterParticipant.objects.filter(email_address=user.email_address)
         roster_ids = []
-        for participant in rosterParticipants:
+        for participant in roster_participants:
             roster_ids.append(participant.roster_id)
         objects = ClassEnrollment.objects.filter(roster_id__in=user.email_address)
         ClassEnrollmentViewSet.logger.info("User: %s", user.email_address)

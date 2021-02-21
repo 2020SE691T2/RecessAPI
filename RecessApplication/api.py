@@ -149,12 +149,10 @@ class WeeklyScheduleAPI(generics.GenericAPIView):
     
     def get(self, request):
         user = request.user
-        print(user)
         participants = self.getRosterParticipants().filter(email_address=user.email_address).values()
 
         roster_ids = set()
         for participant in participants: 
-            print(participant)
             roster_ids.add(participant["roster_id"])    
         enrollments = self.getClassEnrollments().filter(roster_id__in=roster_ids).values()
 
