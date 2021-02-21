@@ -100,6 +100,9 @@ class ClassViewSet(viewsets.ModelViewSet):
             meeting = meeting_json.data
 
             serializer.save(meeting_link=meeting["join_url"], super_link=meeting["start_url"])
+    
+    def get_zoom_proxy(self):
+            return ClassViewSet.zoom_proxy
 
 class ClassEnrollmentViewSet(viewsets.ModelViewSet):
     """
