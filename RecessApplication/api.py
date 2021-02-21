@@ -45,36 +45,37 @@ class CreateEventAPI(generics.GenericAPIView):
             })
     
     def saveClass(self, data, next_class_id):
-        # TODO: add zoom proxy here
-        
-        cl = []
-        for day in data['days']:
-            start = self.convertDatetime(data['start'])
-            end = self.convertDatetime(data['end'])
-            zoom_data = {
-                'topic': data['class_name'],
-                'meeting_type': 8,
-                'start_time': start.time(),
-                'end_time' : end.time(),
-                'duration': (end - start).total_seconds() / 1000 / 60,
-                'weekly_days': int(day) + 2
-            }
-            meeting_json = self.zoom_proxy.create_meeting(zoom_data)
-            meeting = meeting_json.data
-            args = {
-                'class_id' : next_class_id,
-                'class_name' : data['class_name'],
-                'year' : data['year'],
-                'section' : data.get('section',1),
-                'meeting_link' : meeting["join_url"],
-                'super_link' : meeting["start_url"]                
-            }
-            serializer = ClassSerializer(data=args)
-            if serializer.is_valid(raise_exception=False):
-                cl.append(serializer.save())
-            else:
-                return False
-        return cl
+
+        week_days = ""
+        for i in range(0, len(data['days'])):
+            if i != 0 :
+                week_days += ", "
+            week_days += str(int(data['days'][i]) + 2)
+        start = self.convertDatetime(data['start'])
+        end = self.convertDatetime(data['end'])
+#        2021-01-01 09:00:00
+#        2021-02-28 17:12:01.890825
+        zoom_data = {
+            'topic': data['class_name'],
+            'meeting_type': 8,
+            'start_time': start,
+            'duration': (end - start).total_seconds() / 1000 / 60,
+            'weekly_days': week_days
+        }
+        meeting_json = self.zoom_proxy.create_meeting(zoom_data)
+        meeting = meeting_json.data
+        args = {
+            'class_id' : next_class_id,
+            'class_name' : data['class_name'],
+            'year' : data['year'],
+            'section' : data.get('section',1),
+            'meeting_link' : meeting["join_url"],
+            'super_link' : meeting["start_url"]                
+        }
+        serializer = ClassSerializer(data=args)
+        if serializer.is_valid(raise_exception=False):
+            return serializer.save()
+        return False
     
     def saveClassSchedule(self, data, next_class_id):
         cl = []
@@ -82,12 +83,12 @@ class CreateEventAPI(generics.GenericAPIView):
             args = {
                     'class_id' : next_class_id,
                     'schedule_id' : self.getNextScheduleId(),
-                    'weekday' : day,
-                    'start_time' : self.convertDatetime(data['start']),
-                    'end_time' : self.convertDatetime(data['end'])
+                    'weekday' : int(day),
+                    'start_time' : self.convertDatetime(data['start']).time(),
+                    'end_time' : self.convertDatetime(data['end']).time()
                     }
             serializer = ClassScheduleSerializer(data=args)
-            if serializer.is_valid(raise_exception=False):
+            if serializer.is_valid(raise_exception=True):
                 cl.append(serializer.save())
             else:
                 return False
