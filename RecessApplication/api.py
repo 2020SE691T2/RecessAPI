@@ -10,7 +10,7 @@ from .zoom import ZoomProxy
 from datetime import time
 
 from .serializers import CustomUserSerializer, LoginUserSerializer, ClassSerializer, ClassScheduleSerializer, ClassEnrollmentSerializer
-from .models import ClassEnrollment, ClassSchedule, Class
+from .models import ClassEnrollment, ClassSchedule, Class, ClassRosterParticipant
 
 class CreateEventAPI(generics.GenericAPIView):
     permission_classes = (IsStaffPermission, )
@@ -150,10 +150,12 @@ class WeeklyScheduleAPI(generics.GenericAPIView):
     def get(self, request):
         user = request.user
 
-        if user.is_staff:
-            enrollments = self.getClassEnrollments().filter(teacher_email=user.email_address).values()
-        else:
-            enrollments = self.getClassEnrollments().filter(student_email=user.email_address).values()
+        # Get all Rosters where email_address in Roster (will be a roster participant)
+        # List of rosters
+        # Get all enrollments where roster_id in list of roster_ids
+
+        roster_ids = self.getRosterParticipants().filter(email_address=user.email_address).values()
+        enrollments = self.getClassEnrollments().filter(roster_id__in=roster_ids).values()
 
         if not self.exists(enrollments):
             return Response({
@@ -205,6 +207,9 @@ class WeeklyScheduleAPI(generics.GenericAPIView):
         else:
             result.append(wdays[nday])
         return result
+
+    def getRosterParticipants(self):
+        return ClassRosterParticipant.objects
 
     def getClassEnrollments(self):
         return ClassEnrollment.objects

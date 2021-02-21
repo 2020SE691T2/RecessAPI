@@ -74,7 +74,7 @@ class TestViews:
 
         for index in range(TestViews.NUM_STUDENTS):
             student = CustomUser()
-            student.is_staff = False
+            student.role = 'Student'
             student.email_address = 'student@email.com'
             student.first_name = "Little"
             student.last_name = "Student" + str(index)
@@ -82,7 +82,7 @@ class TestViews:
 
         for index in range(TestViews.NUM_TEACHERS):
             teacher = CustomUser()
-            teacher.is_staff = True
+            teacher.role = 'Teacher'
             teacher.email_address = 'teacher@email.com'
             teacher.first_name = "Mr./Mrs."
             teacher.last_name = "Teacher" + str(index)
