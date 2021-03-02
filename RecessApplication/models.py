@@ -138,7 +138,7 @@ class ClassEnrollment(models.Model):
     """
     # required and unique
     enrollment_id = models.IntegerField(primary_key=True)
-    event = models.ForeignKey(Class, related_name='enroll', on_delete=models.CASCADE)
+    event = models.ForeignKey(Class, related_name='enrollment', on_delete=models.CASCADE)
     roster_id = models.IntegerField()
 
     CLASSNAME_FIELD = 'enrollment_id'

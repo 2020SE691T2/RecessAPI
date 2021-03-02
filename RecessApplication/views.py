@@ -132,6 +132,8 @@ class RosterViewSet(viewsets.ModelViewSet):
     serializer_class = ClassRosterSerializer
     logger = logging.getLogger(__name__)
 
+    
+
 #    def get_queryset(self):
 #        roster_id = self.request.roster_id
 #        objects = ClassRoster.objects.filter(roster_id=roster_id)
