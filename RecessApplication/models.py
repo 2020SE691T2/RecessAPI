@@ -115,14 +115,14 @@ class Class(models.Model):
     """
     """
     # required and unique
-    class_id = models.CharField(max_length=100, blank=True, default='', primary_key=True) 
+    event_id = models.CharField(max_length=100, blank=True, default='', primary_key=True) 
     class_name = models.CharField(max_length=100, blank=True, default='') 
     meeting_link = models.CharField(max_length=100, blank=True, default='')
     super_link = models.CharField(max_length=100, blank=True, default='')
     year = models.CharField(max_length=100, blank=True, default='')
     section = models.CharField(max_length=100, blank=True, default='')
     
-    CLASSNAME_FIELD = 'class_id'
+    CLASSNAME_FIELD = 'event_id'
     REQUIRED_FIELDS = ['class_name', 'meeting_link', 'super_link', 'year', 'section']
     
     objects = ClassManager()
@@ -131,18 +131,18 @@ class Class(models.Model):
         db_table = 'classes'
     
     def __str__(self):
-        return str(self.class_id)
+        return str(self.event_id)
 
 class ClassEnrollment(models.Model):
     """
     """
     # required and unique
     enrollment_id = models.IntegerField(primary_key=True)
-    class_id = models.CharField(max_length=100, blank=False, editable=False)
+    event = models.ForeignKey(Class, related_name='enroll', on_delete=models.CASCADE)
     roster_id = models.IntegerField()
 
     CLASSNAME_FIELD = 'enrollment_id'
-    REQUIRED_FIELDS = ['class_id', 'roster_id']
+    REQUIRED_FIELDS = ['event', 'roster_id']
     
     objects = ClassEnrollmentManager()
     
@@ -150,7 +150,7 @@ class ClassEnrollment(models.Model):
         db_table = 'class_enrollment'
     
     def __str__(self):
-        return str(self.class_id)
+        return str(self.event_id)
 
 class ClassRoster(models.Model):
     """
@@ -191,13 +191,13 @@ class ClassSchedule(models.Model):
     """
     # required and unique
     schedule_id = models.IntegerField(primary_key=True)
-    class_id = models.CharField(max_length=100, blank=True, default='')
+    event = models.ForeignKey(Class, related_name='event', on_delete=models.CASCADE)
     weekday = models.IntegerField()
     start_time = models.TimeField()
     end_time = models.TimeField()
 
-    CLASSNAME_FIELD = 'class_id'
-    REQUIRED_FIELDS = ['weekday', 'start_time', 'end_time']
+    CLASSNAME_FIELD = 'schedule_id'
+    REQUIRED_FIELDS = ['event', 'weekday', 'start_time', 'end_time']
     
     objects = ClassScheduleManager()
     
@@ -205,7 +205,7 @@ class ClassSchedule(models.Model):
         db_table = 'class_schedule'
     
     def __str__(self):
-        return str(self.class_id)
+        return str(self.event_id)
 
 class Assignment(models.Model):
     """
@@ -216,10 +216,10 @@ class Assignment(models.Model):
     description = models.CharField(max_length=100000, blank=True, default='')
     assigned_date = models.DateField()
     due_date = models.DateField()
-    class_id = models.CharField(max_length=100, blank=True, default='')
+    event_id = models.CharField(max_length=100, blank=True, default='')
 
     ASSIGNMENTNAME_FIELD = 'assignment_id'
-    REQUIRED_FIELDS = ['name', 'description', 'assigned_date', 'due_date', 'class_id']
+    REQUIRED_FIELDS = ['name', 'description', 'assigned_date', 'due_date', 'event_id']
     
     objects = AssignmentManager()
     

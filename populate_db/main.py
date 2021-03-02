@@ -11,13 +11,17 @@ if __name__ == "__main__":
     recess_database = BuildDatabase()
     
     # create the tables
-    recess_database.create_table(table="users", schema=users_schema)
-    recess_database.create_table(table="classes", schema=classes_schema)
-    recess_database.create_table(table="class_schedule", schema=class_schedule_schema)    
-    recess_database.create_table(table="assignments", schema=assignments_schema)    
-    recess_database.create_table(table="class_roster", schema=class_roster_schema)    
-    recess_database.create_table(table="class_roster_participant", schema=class_roster_participant_schema)    
-    recess_database.create_table(table="class_enrollment", schema=class_enrollment_schema)
+    try:
+        recess_database.create_table(table="users", schema=users_schema)
+        recess_database.create_table(table="classes", schema=classes_schema)
+        recess_database.create_table(table="class_schedule", schema=class_schedule_schema)    
+        recess_database.create_table(table="assignments", schema=assignments_schema)    
+        recess_database.create_table(table="class_roster", schema=class_roster_schema)    
+        recess_database.create_table(table="class_roster_participant", schema=class_roster_participant_schema)    
+        recess_database.create_table(table="class_enrollment", schema=class_enrollment_schema)
+        print("database successfully built!")
+    except:
+        pass
 
     # populate the tables
     recess_database.populate_table(table_name="users", df=pd.read_csv("users_table.csv"))
@@ -28,4 +32,4 @@ if __name__ == "__main__":
     recess_database.populate_table(table_name="class_roster_participant", df=pd.read_csv("class_roster_participant_table.csv"))
     recess_database.populate_table(table_name="class_enrollment", df=pd.read_csv("class_enrollment_table.csv"))
 
-    print("database successfully built!")
+    print("database successfully populated!")

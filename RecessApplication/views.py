@@ -103,7 +103,7 @@ class ClassViewSet(viewsets.ModelViewSet):
             serializer.save(meeting_link=meeting["join_url"], super_link=meeting["start_url"])
     
     def get_zoom_proxy(self):
-            return ClassViewSet.zoom_proxy
+        return ClassViewSet.zoom_proxy
 
 class ClassEnrollmentViewSet(viewsets.ModelViewSet):
     """
@@ -152,7 +152,6 @@ class ClassScheduleViewSet(viewsets.ModelViewSet):
     """
     queryset = ClassSchedule.objects.all()
     serializer_class = ClassScheduleSerializer
-
 
 class AssignmentViewSet(viewsets.ModelViewSet):
     """

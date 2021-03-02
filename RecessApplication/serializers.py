@@ -86,53 +86,57 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
         model = Group
         fields = ['url', 'name']
 
-class ClassSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = Class
-        fields = ['class_id', 'class_name', 'meeting_link', 'year', 'section']
-
 class ClassEnrollmentSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = ClassEnrollment
-        fields = ['enrollment_id', 'class_id', 'roster_id']
+        fields = ['enrollment_id', 'event_id', 'roster_id']
 
 class ClassScheduleSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = ClassSchedule
-        fields = ['class_id', 'schedule_id', 'weekday', 'start_time', 'end_time']
+        fields = ['event_id', 'schedule_id', 'weekday', 'start_time', 'end_time']
+
+class ClassSerializer(serializers.HyperlinkedModelSerializer):
+    class_schedule = ClassScheduleSerializer(source='event', many=True, read_only=True)
+    class_enrollment = ClassEnrollmentSerializer(source='enroll', many=True, read_only=True)
+    
+    class Meta:
+        model = Class
+        fields = ['event_id', 'class_name', 'meeting_link', 'year', 'section', 'class_schedule', 'class_enrollment']
+        read_only_fields = ['event_id']
+        
 
 class AssignmentSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Assignment
-        fields = ['assignment_id', 'name', 'description', 'assigned_date', 'due_date', 'class_id']
+        fields = ['assignment_id', 'name', 'description', 'assigned_date', 'due_date', 'event_id']
 
 class ClassRosterParticipantSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = ClassRosterParticipant
         fields = ['roster_id', 'email_address']
 
 class ClassRosterSerializer(serializers.ModelSerializer):
     participants = ClassRosterParticipantSerializer(many=True)
-
+    
     class Meta:
         model = ClassRoster
         fields = ['roster_id', 'roster_name', 'participants']
         read_only_fields = ['roster_id']
-
+    
     def create(self, validated_data):
         participants_data = validated_data.pop('participants')
         roster_id = ClassRoster.objects.aggregate(Max('roster_id'))['roster_id__max']
-
+        
         if roster_id is None:
             roster_id = 0
         roster_id = roster_id + 1
-
+        
         roster = ClassRoster.objects.create(roster_id=roster_id, **validated_data)
         participant_id = ClassRosterParticipant.objects.aggregate(Max('participant_id'))['participant_id__max']
         if participant_id is None:
             participant_id = 0
-
+        
         for participant in participants_data:
             participant_id = participant_id + 1
             ClassRosterParticipant.objects.create(participant_id=participant_id, roster_id=roster_id, **participant)

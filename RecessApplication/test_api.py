@@ -172,19 +172,19 @@ class TestApi:
         result = ClassEnrollmentManager()
 
         data = []
-        max_class_id=0
+        max_event_id=0
         for index in range(TestApi.NUM_DAILY_CLASSES + TestApi.NUM_WEEKLY_CLASSES):
             item = {}
             item['enrollment_id'] = index + 10
-            item['class_id'] = index
+            item['event_id'] = index
             item['roster_id'] = 1
             data.append(item)
-        max_class_id = TestApi.NUM_DAILY_CLASSES + TestApi.NUM_WEEKLY_CLASSES
+        max_event_id = TestApi.NUM_DAILY_CLASSES + TestApi.NUM_WEEKLY_CLASSES
 
         for index in range(TestApi.NUM_DAILY_CLASSES):
             item = {}
-            item['enrollment_id'] = max_class_id + index + 10
-            item['class_id'] = max_class_id + index
+            item['enrollment_id'] = max_event_id + index + 10
+            item['event_id'] = max_event_id + index
             item['roster_id'] = 1
             data.append(item)
 
@@ -202,24 +202,24 @@ class TestApi:
         result = ClassManager()
 
         data = []
-        max_class_id=0
+        max_event_id=0
         # Make a 'class' for each class designated
         for index in range(TestApi.NUM_DAILY_CLASSES + TestApi.NUM_WEEKLY_CLASSES):
             item = {}
-            item['class_id'] = index
+            item['event_id'] = index
             item['class_name'] = "Class " + str(index)
             item['meeting_link'] = "https://www.google.fake"
             item['section'] = "fake"
             item['year'] = TestApi.SCHEDULED_YEAR
             data.append(item)
-            max_class_id=index
-        max_class_id = max_class_id + 1
+            max_event_id=index
+        max_event_id = max_event_id + 1
 
         # Make a 'class' for each daily designated class for previous year
         for index in range(TestApi.NUM_DAILY_CLASSES):
             item = {}
-            item['class_id'] = index + max_class_id
-            item['class_name'] = "Class " + str(index + max_class_id)
+            item['event_id'] = index + max_event_id
+            item['class_name'] = "Class " + str(index + max_event_id)
             item['meeting_link'] = "https://www.google.fake"
             item['section'] = "fake"
             item['year'] = TestApi.EARLY_YEAR
@@ -243,7 +243,7 @@ class TestApi:
             stop_hour = start_hour+1
 
             item = {}
-            item['class_id'] = index
+            item['event_id'] = index
             item['schedule_id'] = index + 20
             item['weekday'] = index % 5
             item['start_time'] = str(datetime.time(hour=start_hour, minute=0, second=0))
@@ -261,7 +261,7 @@ class TestApi:
                 stop_hour = start_hour+1
 
                 item = {}
-                item['class_id'] = daily_index
+                item['event_id'] = daily_index
                 item['schedule_id'] = daily_index + 20
                 item['weekday'] = -1
                 item['start_time'] = str(datetime.time(hour=start_hour, minute=0, second=0))

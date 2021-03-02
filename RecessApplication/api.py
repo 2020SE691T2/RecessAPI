@@ -22,9 +22,9 @@ class CreateEventAPI(generics.GenericAPIView):
 
     def getNextClassId(self):
         '''
-        return the 'next' id from ids of type class_id in the database
+        return the 'next' id from ids of type event_id in the database
         '''
-        return Class.objects.all().aggregate(Max('class_id'))['class_id__max'] + 1
+        return Class.objects.all().aggregate(Max('event_id'))['event_id__max'] + 1
     
     def getNextScheduleId(self):
         '''
@@ -33,18 +33,18 @@ class CreateEventAPI(generics.GenericAPIView):
         return ClassSchedule.objects.all().aggregate(Max('schedule_id'))['schedule_id__max'] + 1
     
     def post(self, request, *args, **kwargs):
-        next_class_id = self.getNextClassId()
-        class_data = self.saveClass(request.data, next_class_id)
-        class_schedules = self.saveClassSchedule(request.data, next_class_id)
+        next_event_id = self.getNextClassId()
+        class_data = self.saveClass(request.data, next_event_id)
+        class_schedules = self.saveClassSchedule(request.data, next_event_id)
         if not (class_data and class_schedules):
             return Response({
                 "error": "The data was not valid."
             })
         return Response({
-                "class_id": next_class_id
+                "event_id": next_event_id
             })
     
-    def saveClass(self, data, next_class_id):
+    def saveClass(self, data, next_event_id):
 
         week_days = ""
         for i in range(0, len(data['days'])):
@@ -53,8 +53,6 @@ class CreateEventAPI(generics.GenericAPIView):
             week_days += str(int(data['days'][i]) + 2)
         start = self.convertDatetime(data['start'])
         end = self.convertDatetime(data['end'])
-#        2021-01-01 09:00:00
-#        2021-02-28 17:12:01.890825
         zoom_data = {
             'topic': data['class_name'],
             'meeting_type': 8,
@@ -64,8 +62,9 @@ class CreateEventAPI(generics.GenericAPIView):
         }
         meeting_json = self.zoom_proxy.create_meeting(zoom_data)
         meeting = meeting_json.data
+        print(next_event_id)
         args = {
-            'class_id' : next_class_id,
+            'event_id' : next_event_id,
             'class_name' : data['class_name'],
             'year' : data['year'],
             'section' : data.get('section',1),
@@ -77,11 +76,11 @@ class CreateEventAPI(generics.GenericAPIView):
             return serializer.save()
         return False
     
-    def saveClassSchedule(self, data, next_class_id):
+    def saveClassSchedule(self, data, next_event_id):
         cl = []
         for day in data['days']:
             args = {
-                    'class_id' : next_class_id,
+                    'event_id' : next_event_id,
                     'schedule_id' : self.getNextScheduleId(),
                     'weekday' : int(day),
                     'start_time' : self.convertDatetime(data['start']).time(),
@@ -177,18 +176,18 @@ class WeeklyScheduleAPI(generics.GenericAPIView):
         else:
             class_year = year - 1
         
-        class_ids = [ e['class_id'] for e in enrollments ]
-        classes = self.getClasses().filter(class_id__in=class_ids, year=class_year).values()
+        event_ids = [ e['event_id'] for e in enrollments ]
+        classes = self.getClasses().filter(event_id__in=event_ids, year=class_year).values()
 
         result = []
         if self.exists(classes):
-            class_schedules = self.getClassSchedules().filter(class_id__in=class_ids).values()    
+            class_schedules = self.getClassSchedules().filter(event_id__in=event_ids).values()    
             
             for cs in class_schedules:
-                class_item = next((cl for cl in classes if cl['class_id'] == cs['class_id']), {})
+                class_item = next((cl for cl in classes if cl['event_id'] == cs['event_id']), {})
                 if (not class_item) or (class_item['year'] != class_year): continue
                 cs.update(class_item)
-                enr_item = next((enr for enr in enrollments if enr['class_id'] == cs['class_id']), {})
+                enr_item = next((enr for enr in enrollments if enr['event_id'] == cs['event_id']), {})
                 cs.update(enr_item)
                 for day in self.get_weekday_name(int(cs['weekday'])):
                     cs['weekday'] = day

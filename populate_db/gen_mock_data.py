@@ -135,7 +135,7 @@ def generate_classes_table(n: int) -> pd.DataFrame:
     """
     
     df_dict = {
-        "class_id": [i for i in range(1,n+1)],
+        "event_id": [i for i in range(1,n+1)],
         "class_name": [
             "".join(np.random.choice([i for i in string.ascii_lowercase], random.randint(5, 10))) for _ in range(n)
         ],
@@ -177,7 +177,7 @@ def generate_class_enrollment_table(users_df: pd.DataFrame, classes_df: pd.DataF
     '''
     entries: dict = {
         "enrollment_id": [],
-        "class_id": [],
+        "event_id": [],
         "roster_id": []
     }  
     
@@ -188,7 +188,7 @@ def generate_class_enrollment_table(users_df: pd.DataFrame, classes_df: pd.DataF
         i = 0
         while (i <= num_students):
             entries["enrollment_id"] += [j]
-            entries["class_id"] += [row["class_id"]]
+            entries["event_id"] += [row["event_id"]]
             index = random.randint(0,roster_df.shape[0] - 1)
             entries["roster_id"] += [roster_df.iloc[index]['roster_id']]
             i += 1
@@ -209,7 +209,7 @@ def generate_class_schedule_table(classes_df: pd.DataFrame, n: int) -> None:
     '''
     entries: dict = {
         "schedule_id": [],
-        "class_id": [],
+        "event_id": [],
         "weekday": [],
         "start_time": [],
         "end_time": [],
@@ -218,7 +218,7 @@ def generate_class_schedule_table(classes_df: pd.DataFrame, n: int) -> None:
     for idx, row in classes_df.iterrows():
         start_time = random.randint(9, 15)
         entries["schedule_id"] = [i for i in range(1,n+1)]
-        entries["class_id"] += row["class_id"],
+        entries["event_id"] += row["event_id"],
         entries["weekday"] += random.randint(0, 4), # 0 = Monday, 4 = Friday
         entries["start_time"] += time(hour=start_time),
         entries["end_time"] += time(hour=start_time+1),
@@ -241,7 +241,7 @@ def generate_assignments_table(classes_df: pd.DataFrame) -> None:
         "description": [],
         "assigned_date": [],
         "due_date": [],
-        "class_id": [],
+        "event_id": [],
     }
 
     for idx, row in classes_df.iterrows():        
@@ -250,7 +250,7 @@ def generate_assignments_table(classes_df: pd.DataFrame) -> None:
         entries["description"] += ["".join(np.random.choice([i for i in string.ascii_lowercase], random.randint(5, 100)))]
         entries["assigned_date"] += dob_generator(), # may want to revisit
         entries["due_date"] += dob_generator(), # may want to revisit
-        entries["class_id"] += [classes_df.iloc[random.randint(0, len(classes_df.index)-1)]['class_id']]
+        entries["event_id"] += [classes_df.iloc[random.randint(0, len(classes_df.index)-1)]['event_id']]
     
     df = pd.DataFrame(entries)
     df.to_csv("assignments_table.csv", index=False)

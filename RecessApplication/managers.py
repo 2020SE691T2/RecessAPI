@@ -53,14 +53,14 @@ class ClassManager(models.Manager):
     """
     Custom class model manager where class id is the unique identifier.
     """
-    def get_class_data(self, class_id, **extra_fields):
+    def get_class_data(self, event_id, **extra_fields):
         """
         return a class.
         """
-        ClassManager.logger.debug("Getting class data for id %s", class_id)
-        if not class_id:
+        ClassManager.logger.debug("Getting class data for id %s", event_id)
+        if not event_id:
             raise ValueError(_(ErrorMsg.class_dne()))
-        class_data = self.model(class_id=class_id, **extra_fields)
+        class_data = self.model(event_id=event_id, **extra_fields)
         return class_data
 
 class ClassEnrollmentManager(models.Manager):
@@ -69,14 +69,14 @@ class ClassEnrollmentManager(models.Manager):
     """
     Custom class model manager where enrollment id is the unique identifier.
     """
-    def get_class_enrollment_data(self, class_id, **extra_fields):
+    def get_class_enrollment_data(self, event_id, **extra_fields):
         """
         return a class.
         """
-        ClassEnrollmentManager.logger.debug("Getting class enrollment data for id %s", class_id)
-        if not class_id:
+        ClassEnrollmentManager.logger.debug("Getting class enrollment data for id %s", event_id)
+        if not event_id:
             raise ValueError(_(ErrorMsg.class_dne()))
-        class_data = self.model(class_id=class_id, **extra_fields)
+        class_data = self.model(event_id=event_id, **extra_fields)
         return class_data
 
 class ClassScheduleManager(models.Manager):
@@ -85,14 +85,14 @@ class ClassScheduleManager(models.Manager):
     """
     Custom class model manager where class id is the unique identifier.
     """
-    def get_class_schedule_data(self, class_id, **extra_fields):
+    def get_class_schedule_data(self, event_id, **extra_fields):
         """
         return a class.
         """
-        ClassScheduleManager.logger.debug("Getting class schedule data for id %s", class_id)
-        if not class_id:
+        ClassScheduleManager.logger.debug("Getting class schedule data for id %s", event_id)
+        if not event_id:
             raise ValueError(_(ErrorMsg.class_dne()))
-        class_data = self.model(class_id=class_id, **extra_fields)
+        class_data = self.model(event_id=event_id, **extra_fields)
         return class_data
 
 class AssignmentManager(models.Manager):
