@@ -3,6 +3,7 @@ from django.db.models import Max
 from rest_framework import generics
 from rest_framework.permissions import AllowAny, BasePermission, IsAuthenticated
 from .permissions import IsStaffPermission
+from .cache import TeacherStudentCache
 from rest_framework.response import Response
 import logging
 import copy
@@ -53,14 +54,14 @@ class CreateEventAPI(generics.GenericAPIView):
             week_days += str(int(data['days'][i]) + 2)
         start = self.convertDatetime(data['start'])
         end = self.convertDatetime(data['end'])
-#        2021-01-01 09:00:00
-#        2021-02-28 17:12:01.890825
+
         zoom_data = {
             'topic': data['class_name'],
             'meeting_type': 8,
             'start_time': start,
             'duration': (end - start).total_seconds() / 1000 / 60,
-            'weekly_days': week_days
+            'weekly_days': week_days,
+            'year': data['year']
         }
         meeting_json = self.zoom_proxy.create_meeting(zoom_data)
         meeting = meeting_json.data
@@ -101,6 +102,7 @@ class RegistrationAPI(generics.GenericAPIView):
     permission_classes = (AllowAny,)
     serializer_class = CustomUserSerializer
     logger = logging.getLogger(__name__)
+    teacher_student_cache = TeacherStudentCache()
 
     def post(self, request, *args, **kwargs): # need all args for registering a user
         self.getLogger().info("Getting information for %s", request.data)
@@ -114,6 +116,10 @@ class RegistrationAPI(generics.GenericAPIView):
             if 'is_superuser' in request.data.keys() and request.data['is_superuser'] == True:
                 special_fields['is_superuser'] = True
             user = serializer.custom_save( **special_fields )
+
+            # Update our cache
+            self.teacher_student_cache.add_user(user)
+
             return Response({
                 "user": CustomUserSerializer(user, context=self.get_serializer_context()).data,
                 "tokens": user.tokens()
