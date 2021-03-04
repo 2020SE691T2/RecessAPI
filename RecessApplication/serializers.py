@@ -4,6 +4,7 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from RecessApplication.models import CustomUser, Class, ClassEnrollment, ClassSchedule, Assignment, ClassRoster, ClassRosterParticipant
 from django.contrib.auth import authenticate
 from django.db.models import Max
+import logging
 
 class CustomUserSerializer(serializers.HyperlinkedModelSerializer):
 
@@ -114,6 +115,7 @@ class ClassRosterParticipantSerializer(serializers.ModelSerializer):
 
 class ClassRosterSerializer(serializers.ModelSerializer):
     participants = ClassRosterParticipantSerializer(many=True)
+    logger = logging.getLogger(__name__)
 
     class Meta:
         model = ClassRoster
@@ -129,11 +131,40 @@ class ClassRosterSerializer(serializers.ModelSerializer):
         roster_id = roster_id + 1
 
         roster = ClassRoster.objects.create(roster_id=roster_id, **validated_data)
+
+        self.add_participants(roster_id, participants_data)
+
+        return roster
+
+    def update(self, instance, validated_data):
+        roster_id = instance.roster_id
+
+        # Cannot update roster number - will ignore on participants
+        instance.roster_name = validated_data.get('roster_name', instance.roster_name)
+
+        # Only replace participants if 'participants' entry was included
+        # Otherwise leave current participants
+        participants_data = validated_data.get('participants', None)
+        if not participants_data is None:
+            self.logger.info("Replace participants")
+
+            ClassRosterParticipant.objects.filter(roster_id=roster_id).delete()
+            self.add_participants(roster_id, participants_data)
+
+        instance.save()
+
+        return instance
+
+    def add_participants(self, roster_id, participants_data):
+        participant_id = self.get_next_participant_id()
+
+        for participant in participants_data:
+            participant.roster_id = roster_id
+            ClassRosterParticipant.objects.create(participant_id=participant_id, roster_id=roster_id, **participant)
+            participant_id = participant_id + 1
+
+    def get_next_participant_id(self):
         participant_id = ClassRosterParticipant.objects.aggregate(Max('participant_id'))['participant_id__max']
         if participant_id is None:
             participant_id = 0
-
-        for participant in participants_data:
-            participant_id = participant_id + 1
-            ClassRosterParticipant.objects.create(participant_id=participant_id, roster_id=roster_id, **participant)
-        return roster
+        return participant_id + 1

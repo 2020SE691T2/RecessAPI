@@ -3,6 +3,7 @@ from .api import RegistrationAPI, LoginAPI, WeeklyScheduleAPI
 from .managers import ClassEnrollmentManager, ClassManager, ClassScheduleManager, ClassRosterParticipantManager
 from .models import CustomUser, ClassEnrollment, Class, ClassSchedule
 from .serializers import CustomUserSerializer, LoginUserSerializer
+from .cache import TeacherStudentCache
 from .test_utilities import TestLogger, MockRequest
 from rest_framework.response import Response
 from datetime import datetime
@@ -43,9 +44,15 @@ class TestApi:
         registration_api = RegistrationAPI()
         registration_api.get_serializer = MagicMock(return_value=self.mock_registration_serializer(is_valid=is_valid))
         registration_api.getLogger = MagicMock(return_value=TestLogger())
+        registration_api.teacher_student_cache = MagicMock(return_value=self.mock_teacher_student_cache())
         registration_api.request = ""
         registration_api.format_kwarg = ""
         return registration_api
+
+    def mock_teacher_student_cache(self):
+        teacher_student_cache = TeacherStudentCache()
+        teacher_student_cache.get_all_users = MagicMock(return_value=[])
+        return teacher_student_cache
 
     def mock_registration_serializer(self, is_valid):
         self.registration_serializer = CustomUserSerializer()
