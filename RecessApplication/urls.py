@@ -46,7 +46,7 @@ urlpatterns = [
     re_path(r'^api-auth/auth/?', LoginAPI.as_view()),
     re_path(r'^api-auth/?', include('rest_framework.urls', namespace='rest_framework')),
     re_path(r'^api/events/?', WeeklyScheduleAPI.as_view()),
-    re_path(r'^api/create-class/?', CreateEventAPI.as_view()),
+    re_path(r'^api/create-event/?', CreateEventAPI.as_view()),
     re_path(r'^api/token/new/?', views.CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
     re_path(r'^api/token/refresh/?', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),
     re_path(r'^zoom/meetings/(?P<pk>[0-9]+)/?$', views.ZoomMeetingsView.as_view()),
