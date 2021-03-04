@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import serializers, exceptions
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from RecessApplication.models import CustomUser, Class, ClassEnrollment, ClassSchedule, Assignment, ClassRoster, ClassRosterParticipant
+from RecessApplication.models import CustomUser, Event, EventEnrollment, EventSchedule, Assignment, EventRoster, EventRosterParticipant
 from django.contrib.auth import authenticate
 from django.db.models import Max
 
@@ -86,23 +86,23 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
         model = Group
         fields = ['url', 'name']
 
-class ClassEnrollmentSerializer(serializers.HyperlinkedModelSerializer):
+class EventEnrollmentSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = ClassEnrollment
+        model = EventEnrollment
         fields = ['enrollment_id', 'event_id', 'roster_id']
 
-class ClassScheduleSerializer(serializers.HyperlinkedModelSerializer):
+class EventScheduleSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = ClassSchedule
+        model = EventSchedule
         fields = ['event_id', 'schedule_id', 'weekday', 'start_time', 'end_time']
 
-class ClassSerializer(serializers.HyperlinkedModelSerializer):
-    class_schedule = ClassScheduleSerializer(source='event', many=True, read_only=True, required=False)
-    class_enrollment = ClassEnrollmentSerializer(source='enrollment', many=True, read_only=True, required=False)
+class EventSerializer(serializers.HyperlinkedModelSerializer):
+    event_schedule = EventScheduleSerializer(source='event', many=True, read_only=True, required=False)
+    event_enrollment = EventEnrollmentSerializer(source='enrollment', many=True, read_only=True, required=False)
     
     class Meta:
-        model = Class
-        fields = ['event_id', 'class_name', 'meeting_link', 'year', 'section', 'class_schedule', 'class_enrollment']
+        model = Event
+        fields = ['event_id', 'event_name', 'meeting_link', 'year', 'section', 'event_schedule', 'event_enrollment']
         read_only_fields = ['event_id']
         lookup_field = 'event_id'
         
@@ -112,33 +112,33 @@ class AssignmentSerializer(serializers.HyperlinkedModelSerializer):
         model = Assignment
         fields = ['assignment_id', 'name', 'description', 'assigned_date', 'due_date', 'event_id']
 
-class ClassRosterParticipantSerializer(serializers.ModelSerializer):
+class EventRosterParticipantSerializer(serializers.ModelSerializer):
     class Meta:
-        model = ClassRosterParticipant
+        model = EventRosterParticipant
         fields = ['roster_id', 'email_address']
 
-class ClassRosterSerializer(serializers.ModelSerializer):
-    participants = ClassRosterParticipantSerializer(many=True)
+class EventRosterSerializer(serializers.ModelSerializer):
+    participants = EventRosterParticipantSerializer(many=True)
     
     class Meta:
-        model = ClassRoster
+        model = EventRoster
         fields = ['roster_id', 'roster_name', 'participants']
         read_only_fields = ['roster_id']
     
     def create(self, validated_data):
         participants_data = validated_data.pop('participants')
-        roster_id = ClassRoster.objects.aggregate(Max('roster_id'))['roster_id__max']
+        roster_id = EventRoster.objects.aggregate(Max('roster_id'))['roster_id__max']
         
         if roster_id is None:
             roster_id = 0
         roster_id = roster_id + 1
         
-        roster = ClassRoster.objects.create(roster_id=roster_id, **validated_data)
-        participant_id = ClassRosterParticipant.objects.aggregate(Max('participant_id'))['participant_id__max']
+        roster = EventRoster.objects.create(roster_id=roster_id, **validated_data)
+        participant_id = EventRosterParticipant.objects.aggregate(Max('participant_id'))['participant_id__max']
         if participant_id is None:
             participant_id = 0
         
         for participant in participants_data:
             participant_id = participant_id + 1
-            ClassRosterParticipant.objects.create(participant_id=participant_id, roster_id=roster_id, **participant)
+            EventRosterParticipant.objects.create(participant_id=participant_id, roster_id=roster_id, **participant)
         return roster

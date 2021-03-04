@@ -6,8 +6,8 @@ from rest_framework.decorators import action
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
-from RecessApplication.serializers import CustomUserSerializer, GroupSerializer, ClassSerializer, ClassEnrollmentSerializer, ClassScheduleSerializer, AssignmentSerializer, CustomTokenObtainPairSerializer, ChangePasswordSerializer, ClassRosterSerializer, ClassRosterParticipantSerializer
-from RecessApplication.models import Class, ClassEnrollment, ClassSchedule, Assignment, CustomUser, ClassRoster, ClassRosterParticipant
+from RecessApplication.serializers import CustomUserSerializer, GroupSerializer, EventSerializer, EventEnrollmentSerializer, EventScheduleSerializer, AssignmentSerializer, CustomTokenObtainPairSerializer, ChangePasswordSerializer, EventRosterSerializer, EventRosterParticipantSerializer
+from RecessApplication.models import Event, EventEnrollment, EventSchedule, Assignment, CustomUser, EventRoster, EventRosterParticipant
 from RecessApplication.permissions import IsOwner
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .zoom import ZoomProxy
@@ -84,80 +84,72 @@ class ChangePasswordView(generics.UpdateAPIView):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class ClassViewSet(viewsets.ModelViewSet):
+class EventViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows classes to be viewed or edited.
+    API endpoint that allows events to be viewed or edited.
     """
-    queryset = Class.objects.all()
-    serializer_class = ClassSerializer
+    queryset = Event.objects.all()
+    serializer_class = EventSerializer
     zoom_proxy = ZoomProxy()
 
     def perform_create(self, serializer):
         instance = serializer.save()
 
         if not instance.meeting_link or not instance.super_link:
-            data = { "topic": instance.class_name + "-" + instance.section}
+            data = { "topic": instance.event_name + "-" + instance.section}
             meeting_json = self.get_zoom_proxy().create_meeting(data)
             meeting = meeting_json.data
 
             serializer.save(meeting_link=meeting["join_url"], super_link=meeting["start_url"])
     
     def get_zoom_proxy(self):
-        return ClassViewSet.zoom_proxy
+        return EventViewSet.zoom_proxy
 
-class ClassEnrollmentViewSet(viewsets.ModelViewSet):
+class EventEnrollmentViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows class enrollments to be viewed or edited.
+    API endpoint that allows event enrollments to be viewed or edited.
     """
-    queryset = ClassEnrollment.objects.all()
+    queryset = EventEnrollment.objects.all()
     lookup_field = "enrollment_id"
-    serializer_class = ClassEnrollmentSerializer
+    serializer_class = EventEnrollmentSerializer
     logger = logging.getLogger(__name__)
 
     def get_queryset(self):
         user = self.request.user
-        roster_participants = ClassRosterParticipant.objects.filter(email_address=user.email_address)
+        roster_participants = EventRosterParticipant.objects.filter(email_address=user.email_address)
         roster_ids = []
         for participant in roster_participants:
             roster_ids.append(participant.roster_id)
-        objects = ClassEnrollment.objects.filter(roster_id__in=user.email_address)
-        ClassEnrollmentViewSet.logger.info("User: %s", user.email_address)
+        objects = EventEnrollment.objects.filter(roster_id__in=user.email_address)
+        EventEnrollmentViewSet.logger.info("User: %s", user.email_address)
         return objects
 
 class RosterViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows rosters to be viewed or edited.
     """
-    queryset = ClassRoster.objects.all()
-    serializer_class = ClassRosterSerializer
+    queryset = EventRoster.objects.all()
+    serializer_class = EventRosterSerializer
     logger = logging.getLogger(__name__)
-
-    
-
-#    def get_queryset(self):
-#        roster_id = self.request.roster_id
-#        objects = ClassRoster.objects.filter(roster_id=roster_id)
-#        RosterViewSet.logger.info("Roster: %s", roster_id)
-#        return objects
 
 class RosterParticipantViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows rosters to be viewed or edited.
+    API endpoint that allows roster participants to be viewed or edited.
     """
-    queryset = ClassRosterParticipant.objects.all()
-    serializer_class = ClassRosterParticipantSerializer
+    queryset = EventRosterParticipant.objects.all()
+    serializer_class = EventRosterParticipantSerializer
     logger = logging.getLogger(__name__)
 
-class ClassScheduleViewSet(viewsets.ModelViewSet):
+class EventScheduleViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows class schedules to be viewed or edited.
+    API endpoint that allows event schedules to be viewed or edited.
     """
-    queryset = ClassSchedule.objects.all()
-    serializer_class = ClassScheduleSerializer
+    queryset = EventSchedule.objects.all()
+    serializer_class = EventScheduleSerializer
 
 class AssignmentViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows class schedules to be viewed or edited.
+    API endpoint that allows event assignments to be viewed or edited.
     """
     queryset = Assignment.objects.all()
     serializer_class = AssignmentSerializer
@@ -169,7 +161,7 @@ class StudentTeacherViewSet(APIView):
     """
     Returns all teachers and students in separate lists
     """
-
+    
     def get(self, format=None):
         users = self.get_all_users()
 

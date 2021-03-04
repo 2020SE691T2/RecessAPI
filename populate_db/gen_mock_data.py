@@ -123,12 +123,12 @@ def generate_users_table(n: int) -> pd.DataFrame:
     df.to_csv("users_table.csv", index=False)
     return(df)
 
-def generate_classes_table(n: int) -> pd.DataFrame:
+def generate_events_table(n: int) -> pd.DataFrame:
     """
-    Generate classes table (using randomly generated data).
+    Generate events table (using randomly generated data).
     
     Parameters:
-        n: number of classes
+        n: number of events
     
     Return: 
         .csv file with mock data
@@ -136,7 +136,7 @@ def generate_classes_table(n: int) -> pd.DataFrame:
     
     df_dict = {
         "event_id": [i for i in range(1,n+1)],
-        "class_name": [
+        "event_name": [
             "".join(np.random.choice([i for i in string.ascii_lowercase], random.randint(5, 10))) for _ in range(n)
         ],
         "meeting_link": [
@@ -152,26 +152,26 @@ def generate_classes_table(n: int) -> pd.DataFrame:
     }
     
     df_dict["meeting_link"] = [
-        f"https://{class_name}.com"
-        for class_name in df_dict["class_name"]
+        f"https://{event_name}.com"
+        for event_name in df_dict["event_name"]
     ]
     df_dict["super_link"] = [
-        f"https://{class_name}_super.com"
-        for class_name in df_dict["class_name"]
+        f"https://{event_name}_super.com"
+        for event_name in df_dict["event_name"]
     ]
     
     df = pd.DataFrame(df_dict)
-    df.to_csv("classes_table.csv", index=False)
+    df.to_csv("events_table.csv", index=False)
     return df
 
-def generate_class_enrollment_table(users_df: pd.DataFrame, classes_df: pd.DataFrame, roster_df: pd.DataFrame) -> None:
+def generate_event_enrollment_table(users_df: pd.DataFrame, events_df: pd.DataFrame, roster_df: pd.DataFrame) -> None:
     '''
-    Generate classes table (using randomly generated data).
+    Generate event enrollment table (using randomly generated data).
     
     Parameters:
         user_df: the user table
-        classes_df: the classes table
-        roster_df, the class roster table
+        events_df: the events table
+        roster_df, the event roster table
     
     Return: None
     '''
@@ -182,7 +182,7 @@ def generate_class_enrollment_table(users_df: pd.DataFrame, classes_df: pd.DataF
     }  
     
     j = 1
-    for idx, row in classes_df.iterrows():
+    for idx, row in events_df.iterrows():
         num_students = random.randint(12, 25)
         
         i = 0
@@ -195,15 +195,15 @@ def generate_class_enrollment_table(users_df: pd.DataFrame, classes_df: pd.DataF
             j += 1
     
     df = pd.DataFrame(entries)
-    df.to_csv("class_enrollment_table.csv", index=False)
+    df.to_csv("event_enrollment_table.csv", index=False)
 
-def generate_class_schedule_table(classes_df: pd.DataFrame, n: int) -> None:
+def generate_event_schedule_table(events_df: pd.DataFrame, n: int) -> None:
     '''
-    Generate class schedule table.
+    Generate event schedule table.
     
     Parameters:
-        classes_df: the classes table
-        n, the number of classes
+        events_df: the events table
+        n, the number of events
     
     Return: None
     '''
@@ -215,7 +215,7 @@ def generate_class_schedule_table(classes_df: pd.DataFrame, n: int) -> None:
         "end_time": [],
     }  
     
-    for idx, row in classes_df.iterrows():
+    for idx, row in events_df.iterrows():
         start_time = random.randint(9, 15)
         entries["schedule_id"] = [i for i in range(1,n+1)]
         entries["event_id"] += row["event_id"],
@@ -224,14 +224,14 @@ def generate_class_schedule_table(classes_df: pd.DataFrame, n: int) -> None:
         entries["end_time"] += time(hour=start_time+1),
     
     df = pd.DataFrame(entries)
-    df.to_csv("class_schedule_table.csv", index=False)
+    df.to_csv("event_schedule_table.csv", index=False)
 
-def generate_assignments_table(classes_df: pd.DataFrame) -> None:
+def generate_assignments_table(events_df: pd.DataFrame) -> None:
     '''
     Generate assignment table.
     
     Parameters:
-        classes_df: the classes table
+        events_df: the events table
     
     Return: None
     '''
@@ -244,27 +244,27 @@ def generate_assignments_table(classes_df: pd.DataFrame) -> None:
         "event_id": [],
     }
 
-    for idx, row in classes_df.iterrows():        
+    for idx, row in events_df.iterrows():        
         entries["assignment_id"] += random.randint(0, 10000),
         entries["name"] += ["".join(np.random.choice([i for i in string.ascii_lowercase], random.randint(5, 10)))]
         entries["description"] += ["".join(np.random.choice([i for i in string.ascii_lowercase], random.randint(5, 100)))]
         entries["assigned_date"] += dob_generator(), # may want to revisit
         entries["due_date"] += dob_generator(), # may want to revisit
-        entries["event_id"] += [classes_df.iloc[random.randint(0, len(classes_df.index)-1)]['event_id']]
+        entries["event_id"] += [events_df.iloc[random.randint(0, len(events_df.index)-1)]['event_id']]
     
     df = pd.DataFrame(entries)
     df.to_csv("assignments_table.csv", index=False)
 
-def generate_class_roster_table() -> None:
+def generate_event_roster_table() -> None:
     '''
-    Generate class roster table.
+    Generate event roster table.
     The roster id is unique to itself. Each roster will have at least 1 (possibly more) teachers and some number of students (see participants table).
-    Multiple classes, such as science, math and english, could all use the same roster id (this is typical in early education)
+    Multiple events, such as science, math and english, could all use the same roster id (this is typical in early education)
     
     Parameters:
         n: the number of roster ids to generate
     
-    Return: the class roster table
+    Return: the event roster table
     '''    
     entries: dict = {
         "roster_id": [],
@@ -275,16 +275,16 @@ def generate_class_roster_table() -> None:
     entries["roster_name"] = "roster"
     
     df = pd.DataFrame(entries)
-    df.to_csv("class_roster_table.csv", index=False)
+    df.to_csv("event_roster_table.csv", index=False)
     return df
     
-def generate_class_roster_participant_table(users_df: pd.DataFrame, roster_df: pd.DataFrame) -> None:
+def generate_event_roster_participant_table(users_df: pd.DataFrame, roster_df: pd.DataFrame) -> None:
     '''
     Generate class roster participant table.
     
     Parameters:
         user_df, the users table
-        roster_df: the class roster table
+        roster_df: the event roster table
     
     Return: None
     '''    
@@ -307,15 +307,15 @@ def generate_class_roster_participant_table(users_df: pd.DataFrame, roster_df: p
             entries["roster_id"] += [row["roster_id"]]
     
     df = pd.DataFrame(entries)
-    df.to_csv("class_roster_participant_table.csv", index=False)
+    df.to_csv("event_roster_participant_table.csv", index=False)
 
 if __name__ == "__main__":
 
     df_users = generate_users_table(n=100)
-    df_classes = generate_classes_table(n=30)
-    df_roster = generate_class_roster_table() # chose half the number of classes 
+    df_events = generate_events_table(n=30)
+    df_roster = generate_event_roster_table() # chose half the number of events 
     
-    generate_class_enrollment_table(users_df=df_users, classes_df=df_classes, roster_df=df_roster)
-    generate_class_schedule_table(classes_df=df_classes, n=30)
-    generate_assignments_table(classes_df=df_classes)
-    generate_class_roster_participant_table(users_df=df_users, roster_df=df_roster)
+    generate_event_enrollment_table(users_df=df_users, events_df=df_events, roster_df=df_roster)
+    generate_event_schedule_table(events_df=df_events, n=30)
+    generate_assignments_table(events_df=df_events)
+    generate_event_roster_participant_table(users_df=df_users, roster_df=df_roster)

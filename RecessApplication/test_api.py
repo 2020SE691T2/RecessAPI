@@ -1,7 +1,7 @@
 from unittest.mock import MagicMock, patch
 from .api import RegistrationAPI, LoginAPI, WeeklyScheduleAPI
-from .managers import ClassEnrollmentManager, ClassManager, ClassScheduleManager, ClassRosterParticipantManager
-from .models import CustomUser, ClassEnrollment, Class, ClassSchedule
+from .managers import EventEnrollmentManager, EventManager, EventScheduleManager, EventRosterParticipantManager
+from .models import CustomUser, EventEnrollment, Event, EventSchedule
 from .serializers import CustomUserSerializer, LoginUserSerializer
 from .test_utilities import TestLogger, MockRequest
 from rest_framework.response import Response
@@ -20,14 +20,14 @@ class MockWeeklyScheduleAPI(WeeklyScheduleAPI):
     def exists(self, obj):
         return len(obj) > 0
 
-# All test classes should start with 'Test'
+# All test events should start with 'Test'
 class TestApi:
 
     EMAIL_ADDRESS = "email@address.com"
     NOT_A_PASSW0RD = "secret"
     TOKEN = "1234ABCD"
-    NUM_DAILY_CLASSES=1
-    NUM_WEEKLY_CLASSES=5
+    NUM_DAILY_EVENTS=1
+    NUM_WEEKLY_EVENTS=5
     # Nominal testing year
     SCHEDULED_YEAR=2020
     # Year to use for testing 'early' week entries
@@ -146,17 +146,17 @@ class TestApi:
     def mock_schedule_api(self, has_enrollments=True):
         schedule_api = MockWeeklyScheduleAPI()
         schedule_api.getRosterParticipants = MagicMock(return_value=self.mock_roster_data())
-        schedule_api.getClassEnrollments = MagicMock(return_value=self.mock_enrollment_data(has_enrollments))
-        schedule_api.getClasses = MagicMock(return_value=self.mock_class_data())
-        schedule_api.getClassSchedules = MagicMock(return_value=self.mock_class_schedule_data())
+        schedule_api.getEventEnrollments = MagicMock(return_value=self.mock_enrollment_data(has_enrollments))
+        schedule_api.getEventes = MagicMock(return_value=self.mock_event_data())
+        schedule_api.getEventSchedules = MagicMock(return_value=self.mock_event_schedule_data())
         schedule_api.enrollments_exists = MagicMock()
         return schedule_api
 
     def mock_roster_data(self):
-        result = ClassRosterParticipantManager()
+        result = EventRosterParticipantManager()
 
         data = []
-        for index in range(TestApi.NUM_DAILY_CLASSES + TestApi.NUM_WEEKLY_CLASSES):
+        for index in range(TestApi.NUM_DAILY_EVENTS + TestApi.NUM_WEEKLY_EVENTS):
             item = {}
             item['roster_id'] = 1
             item['participant_id'] = index
@@ -169,19 +169,19 @@ class TestApi:
         return result
 
     def mock_enrollment_data(self, has_enrollments):
-        result = ClassEnrollmentManager()
+        result = EventEnrollmentManager()
 
         data = []
         max_event_id=0
-        for index in range(TestApi.NUM_DAILY_CLASSES + TestApi.NUM_WEEKLY_CLASSES):
+        for index in range(TestApi.NUM_DAILY_EVENTS + TestApi.NUM_WEEKLY_EVENTS):
             item = {}
             item['enrollment_id'] = index + 10
             item['event_id'] = index
             item['roster_id'] = 1
             data.append(item)
-        max_event_id = TestApi.NUM_DAILY_CLASSES + TestApi.NUM_WEEKLY_CLASSES
+        max_event_id = TestApi.NUM_DAILY_EVENTS + TestApi.NUM_WEEKLY_EVENTS
 
-        for index in range(TestApi.NUM_DAILY_CLASSES):
+        for index in range(TestApi.NUM_DAILY_EVENTS):
             item = {}
             item['enrollment_id'] = max_event_id + index + 10
             item['event_id'] = max_event_id + index
@@ -198,16 +198,16 @@ class TestApi:
 
         return result
 
-    def mock_class_data(self):
-        result = ClassManager()
+    def mock_event_data(self):
+        result = EventManager()
 
         data = []
         max_event_id=0
         # Make a 'class' for each class designated
-        for index in range(TestApi.NUM_DAILY_CLASSES + TestApi.NUM_WEEKLY_CLASSES):
+        for index in range(TestApi.NUM_DAILY_EVENTS + TestApi.NUM_WEEKLY_EVENTS):
             item = {}
             item['event_id'] = index
-            item['class_name'] = "Class " + str(index)
+            item['event_name'] = "Event " + str(index)
             item['meeting_link'] = "https://www.google.fake"
             item['section'] = "fake"
             item['year'] = TestApi.SCHEDULED_YEAR
@@ -216,10 +216,10 @@ class TestApi:
         max_event_id = max_event_id + 1
 
         # Make a 'class' for each daily designated class for previous year
-        for index in range(TestApi.NUM_DAILY_CLASSES):
+        for index in range(TestApi.NUM_DAILY_EVENTS):
             item = {}
             item['event_id'] = index + max_event_id
-            item['class_name'] = "Class " + str(index + max_event_id)
+            item['event_name'] = "Event " + str(index + max_event_id)
             item['meeting_link'] = "https://www.google.fake"
             item['section'] = "fake"
             item['year'] = TestApi.EARLY_YEAR
@@ -231,14 +231,14 @@ class TestApi:
 
         return result
 
-    def mock_class_schedule_data(self):
-        result = ClassScheduleManager()
+    def mock_event_schedule_data(self):
+        result = EventScheduleManager()
 
         data = []
 
         # Make a 'class' for each class designated (weekly)
         max_previous=0
-        for index in range(TestApi.NUM_WEEKLY_CLASSES):
+        for index in range(TestApi.NUM_WEEKLY_EVENTS):
             start_hour = (6 + index*2) % 20
             stop_hour = start_hour+1
 
@@ -254,7 +254,7 @@ class TestApi:
         # Make a 'class' for each class designated (daily)
         # Then make a 'class' for each daily designated class for previous year
         for index in range(2):
-            for index in range(TestApi.NUM_DAILY_CLASSES):
+            for index in range(TestApi.NUM_DAILY_EVENTS):
                 max_previous = max_previous + 1
                 daily_index = index + max_previous
                 start_hour = (6 + daily_index*2) % 20
@@ -278,13 +278,13 @@ class TestApi:
         request = self.mock_schedule_request(year=TestApi.SCHEDULED_YEAR, week=TestApi.LATE_WEEK)
         schedule_api = self.mock_schedule_api()
         result = schedule_api.get(request)
-        assert len(result.data['schedules']) == TestApi.NUM_WEEKLY_CLASSES + TestApi.NUM_DAILY_CLASSES * 5
+        assert len(result.data['schedules']) == TestApi.NUM_WEEKLY_EVENTS + TestApi.NUM_DAILY_EVENTS * 5
 
     def test_schedule_success_user(self):
         request = self.mock_schedule_request(is_staff=False, year=TestApi.SCHEDULED_YEAR, week=TestApi.LATE_WEEK)
         schedule_api = self.mock_schedule_api()
         result = schedule_api.get(request)
-        assert len(result.data['schedules']) == TestApi.NUM_WEEKLY_CLASSES + TestApi.NUM_DAILY_CLASSES * 5
+        assert len(result.data['schedules']) == TestApi.NUM_WEEKLY_EVENTS + TestApi.NUM_DAILY_EVENTS * 5
 
     def test_schedule_empty_year(self):
         request = self.mock_schedule_request(year=TestApi.BAD_YEAR, week=TestApi.LATE_WEEK)
@@ -296,7 +296,7 @@ class TestApi:
         request = self.mock_schedule_request(year=TestApi.SCHEDULED_YEAR, week=TestApi.EARLY_WEEK)
         schedule_api = self.mock_schedule_api()
         result = schedule_api.get(request)
-        assert len(result.data['schedules']) == TestApi.NUM_DAILY_CLASSES * 5
+        assert len(result.data['schedules']) == TestApi.NUM_DAILY_EVENTS * 5
 
     def test_schedule_failure_enrollments(self):
         request = self.mock_schedule_request(year=TestApi.SCHEDULED_YEAR, week=TestApi.EARLY_WEEK)

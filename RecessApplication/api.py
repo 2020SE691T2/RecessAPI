@@ -9,8 +9,8 @@ import copy
 from .zoom import ZoomProxy
 from datetime import time
 
-from .serializers import CustomUserSerializer, LoginUserSerializer, ClassSerializer, ClassScheduleSerializer, ClassEnrollmentSerializer
-from .models import ClassEnrollment, ClassSchedule, Class, ClassRosterParticipant
+from .serializers import CustomUserSerializer, LoginUserSerializer, EventSerializer, EventScheduleSerializer, EventEnrollmentSerializer
+from .models import EventEnrollment, EventSchedule, Event, EventRosterParticipant
 
 class CreateEventAPI(generics.GenericAPIView):
     permission_classes = (IsStaffPermission, )
@@ -20,23 +20,23 @@ class CreateEventAPI(generics.GenericAPIView):
     def convertDatetime(self, time_obj):        
         return datetime.fromisoformat('2021-01-01T' + time_obj + ':00')
 
-    def getNextClassId(self):
+    def getNextEventId(self):
         '''
         return the 'next' id from ids of type event_id in the database
         '''
-        return Class.objects.all().aggregate(Max('event_id'))['event_id__max'] + 1
+        return Event.objects.all().aggregate(Max('event_id'))['event_id__max'] + 1
     
     def getNextScheduleId(self):
         '''
         return the 'next' id from ids of type schedule_id in the database
         '''
-        return ClassSchedule.objects.all().aggregate(Max('schedule_id'))['schedule_id__max'] + 1
+        return EventSchedule.objects.all().aggregate(Max('schedule_id'))['schedule_id__max'] + 1
     
     def post(self, request, *args, **kwargs):
-        next_event_id = self.getNextClassId()
-        class_data = self.saveClass(request.data, next_event_id)
-        class_schedules = self.saveClassSchedule(request.data, next_event_id)
-        if not (class_data and class_schedules):
+        next_event_id = self.getNextEventId()
+        event_data = self.saveEvent(request.data, next_event_id)
+        event_schedules = self.saveEventSchedule(request.data, next_event_id)
+        if not (event_data and event_schedules):
             return Response({
                 "error": "The data was not valid."
             })
@@ -44,7 +44,7 @@ class CreateEventAPI(generics.GenericAPIView):
                 "event_id": next_event_id
             })
     
-    def saveClass(self, data, next_event_id):
+    def saveEvent(self, data, next_event_id):
 
         week_days = ""
         for i in range(0, len(data['days'])):
@@ -54,7 +54,7 @@ class CreateEventAPI(generics.GenericAPIView):
         start = self.convertDatetime(data['start'])
         end = self.convertDatetime(data['end'])
         zoom_data = {
-            'topic': data['class_name'],
+            'topic': data['event_name'],
             'meeting_type': 8,
             'start_time': start,
             'duration': (end - start).total_seconds() / 1000 / 60,
@@ -65,18 +65,18 @@ class CreateEventAPI(generics.GenericAPIView):
         print(next_event_id)
         args = {
             'event_id' : next_event_id,
-            'class_name' : data['class_name'],
+            'event_name' : data['event_name'],
             'year' : data['year'],
             'section' : data.get('section',1),
             'meeting_link' : meeting["join_url"],
             'super_link' : meeting["start_url"]                
         }
-        serializer = ClassSerializer(data=args)
+        serializer = EventSerializer(data=args)
         if serializer.is_valid(raise_exception=False):
             return serializer.save()
         return False
     
-    def saveClassSchedule(self, data, next_event_id):
+    def saveEventSchedule(self, data, next_event_id):
         cl = []
         for day in data['days']:
             args = {
@@ -86,7 +86,7 @@ class CreateEventAPI(generics.GenericAPIView):
                     'start_time' : self.convertDatetime(data['start']).time(),
                     'end_time' : self.convertDatetime(data['end']).time()
                     }
-            serializer = ClassScheduleSerializer(data=args)
+            serializer = EventScheduleSerializer(data=args)
             if serializer.is_valid(raise_exception=True):
                 cl.append(serializer.save())
             else:
@@ -145,7 +145,7 @@ class LoginAPI(generics.GenericAPIView):
 
 class WeeklyScheduleAPI(generics.GenericAPIView):
     logger = logging.getLogger(__name__)
-    serializer_class = ClassEnrollmentSerializer
+    serializer_class = EventEnrollmentSerializer
     
     def get(self, request):
         user = request.user
@@ -154,11 +154,11 @@ class WeeklyScheduleAPI(generics.GenericAPIView):
         roster_ids = set()
         for participant in participants: 
             roster_ids.add(participant["roster_id"])    
-        enrollments = self.getClassEnrollments().filter(roster_id__in=roster_ids).values()
+        enrollments = self.getEventEnrollments().filter(roster_id__in=roster_ids).values()
 
         if not self.exists(enrollments):
             return Response({
-                "error": "User is not enrolled in or teaching any classes."
+                "error": "User is not enrolled in or teaching any events."
             })
         
         if not (request.GET.get("year")) :     
@@ -172,21 +172,21 @@ class WeeklyScheduleAPI(generics.GenericAPIView):
             week = int(request.GET.get("week"))
         
         if week >= 30:
-            class_year = year
+            event_year = year
         else:
-            class_year = year - 1
+            event_year = year - 1
         
         event_ids = [ e['event_id'] for e in enrollments ]
-        classes = self.getClasses().filter(event_id__in=event_ids, year=class_year).values()
+        events = self.getEventes().filter(event_id__in=event_ids, year=event_year).values()
 
         result = []
-        if self.exists(classes):
-            class_schedules = self.getClassSchedules().filter(event_id__in=event_ids).values()    
+        if self.exists(events):
+            event_schedules = self.getEventSchedules().filter(event_id__in=event_ids).values()    
             
-            for cs in class_schedules:
-                class_item = next((cl for cl in classes if cl['event_id'] == cs['event_id']), {})
-                if (not class_item) or (class_item['year'] != class_year): continue
-                cs.update(class_item)
+            for cs in event_schedules:
+                event_item = next((cl for cl in events if cl['event_id'] == cs['event_id']), {})
+                if (not event_item) or (event_item['year'] != event_year): continue
+                cs.update(event_item)
                 enr_item = next((enr for enr in enrollments if enr['event_id'] == cs['event_id']), {})
                 cs.update(enr_item)
                 for day in self.get_weekday_name(int(cs['weekday'])):
@@ -208,16 +208,16 @@ class WeeklyScheduleAPI(generics.GenericAPIView):
         return result
 
     def getRosterParticipants(self):
-        return ClassRosterParticipant.objects
+        return EventRosterParticipant.objects
 
-    def getClassEnrollments(self):
-        return ClassEnrollment.objects
+    def getEventEnrollments(self):
+        return EventEnrollment.objects
 
-    def getClasses(self):
-        return Class.objects
+    def getEventes(self):
+        return Event.objects
     
-    def getClassSchedules(self):
-        return ClassSchedule.objects
+    def getEventSchedules(self):
+        return EventSchedule.objects
 
     def getLogger(self):
         return WeeklyScheduleAPI.logger

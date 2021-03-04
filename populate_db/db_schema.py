@@ -12,42 +12,42 @@ IS_STAFF BOOLEAN NOT NULL,
 IS_SUPERUSER BOOLEAN NOT NULL
 """
 
-classes_schema = """
-event_id INTEGER PRIMARY KEY,
-CLASS_NAME VARCHAR NOT NULL,
+events_schema = """
+EVENT_ID INTEGER PRIMARY KEY,
+EVENT_NAME VARCHAR NOT NULL,
 MEETING_LINK VARCHAR NOT NULL,
 SUPER_LINK VARCHAR NOT NULL,
 YEAR INTEGER,
 SECTION VARCHAR
 """
 
-class_roster_participant_schema = """
+event_roster_participant_schema = """
 PARTICIPANT_ID INTEGER PRIMARY KEY,
 ROSTER_ID INTEGER,
 EMAIL_ADDRESS VARCHAR,
-CONSTRAINT fk_roster FOREIGN KEY(roster_id) REFERENCES class_roster(roster_id)
+CONSTRAINT fk_roster FOREIGN KEY(roster_id) REFERENCES event_roster(roster_id)
 """
 
-class_roster_schema = """
+event_roster_schema = """
 ROSTER_ID INTEGER PRIMARY KEY,
 ROSTER_NAME VARCHAR NOT NULL
 """
 
-class_enrollment_schema = """
+event_enrollment_schema = """
 ENROLLMENT_ID INTEGER PRIMARY KEY,
-event_id INTEGER NOT NULL,
+EVENT_ID INTEGER NOT NULL,
 ROSTER_ID INTEGER NOT NULL,
-CONSTRAINT fk_roster FOREIGN KEY(roster_id) REFERENCES class_roster(roster_id),
-CONSTRAINT fk_event FOREIGN KEY(event_id) REFERENCES classes(event_id) ON DELETE CASCADE
+CONSTRAINT fk_roster FOREIGN KEY(roster_id) REFERENCES event_roster(roster_id),
+CONSTRAINT fk_event FOREIGN KEY(event_id) REFERENCES events(event_id) ON DELETE CASCADE
 """
 
-class_schedule_schema = """
+event_schedule_schema = """
 SCHEDULE_ID INTEGER PRIMARY KEY,
-event_id INTEGER NOT NULL,
+EVENT_ID INTEGER NOT NULL,
 WEEKDAY INTEGER,
 START_TIME TIME,
 END_TIME TIME,
-CONSTRAINT fk_event FOREIGN KEY(event_id) REFERENCES classes(event_id) ON DELETE CASCADE
+CONSTRAINT fk_event FOREIGN KEY(event_id) REFERENCES events(event_id) ON DELETE CASCADE
 """
 
 assignments_schema = """
@@ -56,6 +56,6 @@ NAME VARCHAR NOT NULL,
 DESCRIPTION VARCHAR NOT NULL,
 ASSIGNED_DATE DATE NOT NULL,
 DUE_DATE DATE NOT NULL,
-event_id INTEGER NOT NULL,
-CONSTRAINT fk_event FOREIGN KEY(event_id) REFERENCES classes(event_id) ON DELETE CASCADE
+EVENT_ID INTEGER NOT NULL,
+CONSTRAINT fk_event FOREIGN KEY(event_id) REFERENCES events(event_id) ON DELETE CASCADE
 """
