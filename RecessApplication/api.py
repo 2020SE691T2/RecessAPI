@@ -12,7 +12,9 @@ from datetime import time
 from .serializers import CustomUserSerializer, LoginUserSerializer, EventSerializer, EventScheduleSerializer, EventEnrollmentSerializer
 from .models import EventEnrollment, EventSchedule, Event, EventRosterParticipant
 
+
 class CreateEventAPI(generics.GenericAPIView):
+    
     permission_classes = (IsStaffPermission, )
     logger = logging.getLogger(__name__)
     zoom_proxy = ZoomProxy()
@@ -35,11 +37,11 @@ class CreateEventAPI(generics.GenericAPIView):
     def post(self, request, *args, **kwargs):
         next_event_id = self.getNextEventId()
         event_data = self.saveEvent(request.data, next_event_id)
-        event_schedules = self.saveEventSchedule(request.data, next_event_id)
-        if not (event_data and event_schedules):
+        if not (event_data):
             return Response({
                 "error": "The data was not valid."
             })
+        self.saveEventSchedule(request.data, next_event_id)
         return Response({
                 "event_id": next_event_id
             })
@@ -62,36 +64,29 @@ class CreateEventAPI(generics.GenericAPIView):
         }
         meeting_json = self.zoom_proxy.create_meeting(zoom_data)
         meeting = meeting_json.data
-        print(next_event_id)
         args = {
             'event_id' : next_event_id,
             'event_name' : data['event_name'],
             'year' : data['year'],
             'section' : data.get('section',1),
             'meeting_link' : meeting["join_url"],
-            'super_link' : meeting["start_url"]                
+            'super_link' : meeting["start_url"],
         }
         serializer = EventSerializer(data=args)
-        if serializer.is_valid(raise_exception=False):
+        if serializer.is_valid(raise_exception=True):
             return serializer.save()
         return False
     
     def saveEventSchedule(self, data, next_event_id):
-        cl = []
+        start_time=self.convertDatetime(data['start']).time()
+        end_time=self.convertDatetime(data['end']).time()
         for day in data['days']:
-            args = {
-                    'event_id' : next_event_id,
-                    'schedule_id' : self.getNextScheduleId(),
-                    'weekday' : int(day),
-                    'start_time' : self.convertDatetime(data['start']).time(),
-                    'end_time' : self.convertDatetime(data['end']).time()
-                    }
-            serializer = EventScheduleSerializer(data=args)
-            if serializer.is_valid(raise_exception=True):
-                cl.append(serializer.save())
-            else:
-                return False
-        return cl
+            EventSchedule.objects.create(schedule_id=self.getNextScheduleId(), 
+                                         event_id=next_event_id, 
+                                         weekday=day, 
+                                         start_time=start_time,
+                                         end_time=end_time)
+        return
 
     def getLogger(self):
         return CreateEventAPI.logger

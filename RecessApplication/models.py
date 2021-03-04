@@ -115,10 +115,10 @@ class Event(models.Model):
     """
     """
     # required and unique
-    event_id = models.CharField(max_length=100, blank=True, default='', primary_key=True) 
+    event_id = models.IntegerField(primary_key=True)
     event_name = models.CharField(max_length=100, blank=True, default='') 
-    meeting_link = models.CharField(max_length=100, blank=True, default='')
-    super_link = models.CharField(max_length=100, blank=True, default='')
+    meeting_link = models.CharField(max_length=1000, blank=True, default='')
+    super_link = models.CharField(max_length=1000, blank=True, default='')
     year = models.CharField(max_length=100, blank=True, default='')
     section = models.CharField(max_length=100, blank=True, default='')
     
@@ -191,7 +191,7 @@ class EventSchedule(models.Model):
     """
     # required and unique
     schedule_id = models.IntegerField(primary_key=True)
-    event = models.ForeignKey(Event, related_name='event', on_delete=models.CASCADE)
+    event = models.ForeignKey(Event, related_name='schedule', on_delete=models.CASCADE)
     weekday = models.IntegerField()
     start_time = models.TimeField()
     end_time = models.TimeField()

@@ -97,15 +97,13 @@ class EventScheduleSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['event_id', 'schedule_id', 'weekday', 'start_time', 'end_time']
 
 class EventSerializer(serializers.HyperlinkedModelSerializer):
-    event_schedule = EventScheduleSerializer(source='event', many=True, read_only=True, required=False)
-    event_enrollment = EventEnrollmentSerializer(source='enrollment', many=True, read_only=True, required=False)
+    event_schedule = EventScheduleSerializer(source='schedule', many=True, required=False)
+    event_enrollment = EventEnrollmentSerializer(source='enrollment', many=True, required=False)
     
     class Meta:
         model = Event
-        fields = ['event_id', 'event_name', 'meeting_link', 'year', 'section', 'event_schedule', 'event_enrollment']
-        read_only_fields = ['event_id']
+        fields = ['event_id', 'event_name', 'year', 'section', 'meeting_link', 'super_link', 'event_schedule', 'event_enrollment']
         lookup_field = 'event_id'
-        
 
 class AssignmentSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
