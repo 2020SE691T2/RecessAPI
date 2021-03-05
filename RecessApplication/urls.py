@@ -23,6 +23,7 @@ from .api import CreateEventAPI, LoginAPI, RegistrationAPI, WeeklyScheduleAPI
 from .views import ChangePasswordView
 import logging
 from .router import OptionalSlashRouter
+from .cache import TeacherStudentCache
 
 router = OptionalSlashRouter()
 
@@ -58,3 +59,8 @@ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 logger = logging.getLogger(__name__)
 logger.info("----- INITIALIZATION COMPLETE -----")
+
+# Warm start the Teacher Student Cache
+# Takes a little while to build the list
+teacher_student_cache = TeacherStudentCache()
+teacher_student_cache.initialize()

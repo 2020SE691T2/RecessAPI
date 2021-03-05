@@ -4,7 +4,6 @@ from django.db import models
 import logging
 from .strcnst import ErrorMsg
 
-
 class CustomUserManager(BaseUserManager):
     logger = logging.getLogger(__name__)
 

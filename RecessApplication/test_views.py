@@ -1,4 +1,5 @@
 from unittest.mock import MagicMock, ANY
+from .cache import TeacherStudentCache
 from .models import CustomUser, Event
 from .serializers import EventSerializer
 from .views import UserViewSet, EventViewSet, ZoomMeetingsView, ZoomMeetingsListView, StudentTeacherViewSet
@@ -66,8 +67,14 @@ class TestViews:
 
     def mock_student_teacher_view(self):
         student_teacher_view = StudentTeacherViewSet()
-        student_teacher_view.get_all_users = MagicMock(return_value=self.mock_get_students_teachers())
+        student_teacher_view.teacher_student_cache = self.mock_student_teacher_cache()
         return student_teacher_view
+
+    def mock_student_teacher_cache(self):
+        student_teacher_cache = TeacherStudentCache()
+        student_teacher_cache.get_all_users = MagicMock(return_value=self.mock_get_students_teachers())
+        student_teacher_cache.initialize()
+        return student_teacher_cache
 
     def mock_get_students_teachers(self):
         users = []

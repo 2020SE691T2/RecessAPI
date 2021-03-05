@@ -9,6 +9,7 @@ from django.shortcuts import get_object_or_404
 from RecessApplication.serializers import CustomUserSerializer, GroupSerializer, EventSerializer, EventEnrollmentSerializer, EventScheduleSerializer, AssignmentSerializer, CustomTokenObtainPairSerializer, ChangePasswordSerializer, EventRosterSerializer, EventRosterParticipantSerializer
 from RecessApplication.models import Event, EventEnrollment, EventSchedule, Assignment, CustomUser, EventRoster, EventRosterParticipant
 from RecessApplication.permissions import IsOwner
+from .cache import TeacherStudentCache
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .zoom import ZoomProxy
 import logging
@@ -131,7 +132,11 @@ class RosterViewSet(viewsets.ModelViewSet):
     queryset = EventRoster.objects.all()
     serializer_class = EventRosterSerializer
     logger = logging.getLogger(__name__)
-
+    
+    def partial_update(self, request, *args, **kwargs):
+        kwargs['partial'] = True
+        return self.update(request, *args, **kwargs)
+    
 class RosterParticipantViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows roster participants to be viewed or edited.
@@ -162,39 +167,16 @@ class StudentTeacherViewSet(APIView):
     Returns all teachers and students in separate lists
     """
     
+    teacher_student_cache = TeacherStudentCache()
+    
     def get(self, format=None):
-        users = self.get_all_users()
-
-        teachers = []
-        students = []
-
-        for user in users:
-            if user.role.lower() == 'teacher':
-                teachers.append(self.encode_user(user))
-            elif user.role.lower() == 'student':
-                students.append(self.encode_user(user))
-
-        data = {}
-        data['teachers'] = teachers
-        data['students'] = students
-
         response = {
             'status': 'success',
             'code': status.HTTP_200_OK,
-            'data': json.dumps(data)
+            'data': json.dumps(self.teacher_student_cache.get_data())
         }
 
         return Response(response)
-
-    def encode_user(self, user):
-        data = {}
-        data["emailaddress"] = user.email_address
-        data["firstname"] = user.first_name
-        data["lastname"] = user.last_name
-        return data
-
-    def get_all_users(self):
-        return CustomUser.objects.all()
 
 class ZoomMeetingsView(APIView):
     """
