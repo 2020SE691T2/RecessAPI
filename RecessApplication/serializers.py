@@ -116,8 +116,8 @@ class EventRosterParticipantSerializer(serializers.ModelSerializer):
         model = EventRosterParticipant
         fields = ['roster_id', 'email_address']
 
-class ClassRosterSerializer(serializers.ModelSerializer):
-    participants = ClassRosterParticipantSerializer(many=True)
+class EventRosterSerializer(serializers.ModelSerializer):
+    participants = EventRosterParticipantSerializer(many=True)
     logger = logging.getLogger(__name__)
 
     class Meta:
