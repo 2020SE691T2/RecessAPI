@@ -9,7 +9,7 @@ from django.urls import reverse
 from django_rest_passwordreset.signals import reset_password_token_created
 from django.core.mail import send_mail  
 from rest_framework_simplejwt.tokens import RefreshToken
-from .managers import CustomUserManager, ClassManager, ClassEnrollmentManager, ClassScheduleManager, AssignmentManager, ClassRosterManager, ClassRosterParticipantManager
+from .managers import CustomUserManager, EventManager, EventEnrollmentManager, EventScheduleManager, AssignmentManager, EventRosterManager, EventRosterParticipantManager
 
 @receiver(reset_password_token_created)
 def password_reset_token_created(sender, instance, reset_password_token, *args, **kwargs):
@@ -111,48 +111,48 @@ class CustomUser(AbstractBaseUser):
             'access' : str(refresh.access_token)
         }
 
-class Class(models.Model):
+class Event(models.Model):
     """
     """
     # required and unique
-    class_id = models.CharField(max_length=100, blank=True, default='', primary_key=True) 
-    class_name = models.CharField(max_length=100, blank=True, default='') 
-    meeting_link = models.CharField(max_length=100, blank=True, default='')
-    super_link = models.CharField(max_length=100, blank=True, default='')
+    event_id = models.IntegerField(primary_key=True)
+    event_name = models.CharField(max_length=100, blank=True, default='') 
+    meeting_link = models.CharField(max_length=1000, blank=True, default='')
+    super_link = models.CharField(max_length=1000, blank=True, default='')
     year = models.CharField(max_length=100, blank=True, default='')
     section = models.CharField(max_length=100, blank=True, default='')
     
-    CLASSNAME_FIELD = 'class_id'
-    REQUIRED_FIELDS = ['class_name', 'meeting_link', 'super_link', 'year', 'section']
+    CLASSNAME_FIELD = 'event_id'
+    REQUIRED_FIELDS = ['event_name', 'meeting_link', 'super_link', 'year', 'section']
     
-    objects = ClassManager()
+    objects = EventManager()
     
     class Meta:
-        db_table = 'classes'
+        db_table = 'events'
     
     def __str__(self):
-        return str(self.class_id)
+        return str(self.event_id)
 
-class ClassEnrollment(models.Model):
+class EventEnrollment(models.Model):
     """
     """
     # required and unique
     enrollment_id = models.IntegerField(primary_key=True)
-    class_id = models.CharField(max_length=100, blank=False, editable=False)
+    event = models.ForeignKey(Event, related_name='enrollment', on_delete=models.CASCADE)
     roster_id = models.IntegerField()
 
     CLASSNAME_FIELD = 'enrollment_id'
-    REQUIRED_FIELDS = ['class_id', 'roster_id']
+    REQUIRED_FIELDS = ['event', 'roster_id']
     
-    objects = ClassEnrollmentManager()
+    objects = EventEnrollmentManager()
     
     class Meta:
-        db_table = 'class_enrollment'
+        db_table = 'event_enrollment'
     
     def __str__(self):
-        return str(self.class_id)
+        return str(self.event_id)
 
-class ClassRoster(models.Model):
+class EventRoster(models.Model):
     """
     """
     roster_id = models.IntegerField(primary_key=True)
@@ -161,51 +161,51 @@ class ClassRoster(models.Model):
     CLASSNAME_FIELD = 'roster_id'
     REQUIRED_FIELDS = ['roster_name']
     
-    objects = ClassRosterManager()
+    objects = EventRosterManager()
     
     class Meta:
-        db_table = 'class_roster'
+        db_table = 'event_roster'
     
     def __str__(self):
         return str(self.roster_id)
 
-class ClassRosterParticipant(models.Model):
+class EventRosterParticipant(models.Model):
     participant_id = models.IntegerField(primary_key=True)
-    roster = models.ForeignKey(ClassRoster, related_name='participants', on_delete=models.CASCADE)
+    roster = models.ForeignKey(EventRoster, related_name='participants', on_delete=models.CASCADE)
     email_address = models.EmailField(_('email_address'))
 
     CLASSNAME_FIELD = 'participant_id'
     REQUIRED_FIELDS = ['roster', 'email_address']
     
-    objects = ClassRosterParticipantManager()
+    objects = EventRosterParticipantManager()
     
     class Meta:
         unique_together = ['roster', 'email_address']
-        db_table = 'class_roster_participant'
+        db_table = 'event_roster_participant'
     
     def __str__(self):
         return str(self.roster_id) + " " + self.email_address
 
-class ClassSchedule(models.Model):
+class EventSchedule(models.Model):
     """
     """
     # required and unique
     schedule_id = models.IntegerField(primary_key=True)
-    class_id = models.CharField(max_length=100, blank=True, default='')
+    event = models.ForeignKey(Event, related_name='schedule', on_delete=models.CASCADE)
     weekday = models.IntegerField()
     start_time = models.TimeField()
     end_time = models.TimeField()
 
-    CLASSNAME_FIELD = 'class_id'
-    REQUIRED_FIELDS = ['weekday', 'start_time', 'end_time']
+    CLASSNAME_FIELD = 'schedule_id'
+    REQUIRED_FIELDS = ['event', 'weekday', 'start_time', 'end_time']
     
-    objects = ClassScheduleManager()
+    objects = EventScheduleManager()
     
     class Meta:
-        db_table = 'class_schedule'
+        db_table = 'event_schedule'
     
     def __str__(self):
-        return str(self.class_id)
+        return str(self.event_id)
 
 class Assignment(models.Model):
     """
@@ -216,10 +216,10 @@ class Assignment(models.Model):
     description = models.CharField(max_length=100000, blank=True, default='')
     assigned_date = models.DateField()
     due_date = models.DateField()
-    class_id = models.CharField(max_length=100, blank=True, default='')
+    event_id = models.CharField(max_length=100, blank=True, default='')
 
     ASSIGNMENTNAME_FIELD = 'assignment_id'
-    REQUIRED_FIELDS = ['name', 'description', 'assigned_date', 'due_date', 'class_id']
+    REQUIRED_FIELDS = ['name', 'description', 'assigned_date', 'due_date', 'event_id']
     
     objects = AssignmentManager()
     

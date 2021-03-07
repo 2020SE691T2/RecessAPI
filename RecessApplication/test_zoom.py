@@ -7,7 +7,7 @@ from rest_framework import status
 # All test files should start with 'test_'
 # Standard convention is test_<name of thing being tested>
 
-# All test classes should start with 'Test'
+# All test events should start with 'Test'
 class TestZoom:
     FAKE_SECRET = "SECRET"
     STATUS_SUCCESS = 200

@@ -5,7 +5,7 @@ from RecessApplication.models import CustomUser
 # All test files should start with 'test_'
 # Standard convention is test_<name of thing being tested>
 
-# All test classes should start with 'Test'
+# All test events should start with 'Test'
 class TestBackend:
     USERNAME = "TEST_USERNAME"
     PASSWORD = "TEST_PASSWORD"

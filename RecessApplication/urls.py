@@ -6,7 +6,7 @@ Examples:
 Function views
     1. Add an import:  from my_app import views
     2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
+Event-based views
     1. Add an import:  from other_app.views import Home
     2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
 Including another URLconf
@@ -29,9 +29,9 @@ router = OptionalSlashRouter()
 
 router.register(r'users', views.UserViewSet)
 router.register(r'groups', views.GroupViewSet)
-router.register(r'class_info', views.ClassViewSet)
-router.register(r'class_enrollment', views.ClassEnrollmentViewSet)
-router.register(r'class_schedule', views.ClassScheduleViewSet)
+router.register(r'event_info', views.EventViewSet)
+router.register(r'event_enrollment', views.EventEnrollmentViewSet)
+router.register(r'event_schedule', views.EventScheduleViewSet)
 router.register(r'assignments', views.AssignmentViewSet)
 router.register(r'roster', views.RosterViewSet)
 router.register(r'roster_participant', views.RosterParticipantViewSet)
@@ -46,8 +46,8 @@ urlpatterns = [
     re_path(r'^api-auth/register/?', RegistrationAPI.as_view()),
     re_path(r'^api-auth/auth/?', LoginAPI.as_view()),
     re_path(r'^api-auth/?', include('rest_framework.urls', namespace='rest_framework')),
-    re_path(r'^api/classes/?', WeeklyScheduleAPI.as_view()),
-    re_path(r'^api/create-class/?', CreateEventAPI.as_view()),
+    re_path(r'^api/events/?', WeeklyScheduleAPI.as_view()),
+    re_path(r'^api/create-event/?', CreateEventAPI.as_view()),
     re_path(r'^api/token/new/?', views.CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
     re_path(r'^api/token/refresh/?', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),
     re_path(r'^zoom/meetings/(?P<pk>[0-9]+)/?$', views.ZoomMeetingsView.as_view()),

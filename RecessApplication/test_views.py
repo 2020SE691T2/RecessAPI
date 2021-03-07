@@ -1,8 +1,8 @@
 from unittest.mock import MagicMock, ANY
 from .cache import TeacherStudentCache
-from .models import CustomUser, Class
-from .serializers import ClassSerializer
-from .views import UserViewSet, ClassViewSet, ZoomMeetingsView, ZoomMeetingsListView, StudentTeacherViewSet
+from .models import CustomUser, Event
+from .serializers import EventSerializer
+from .views import UserViewSet, EventViewSet, ZoomMeetingsView, ZoomMeetingsListView, StudentTeacherViewSet
 from .test_utilities import MockRequest
 from .zoom import ZoomProxy
 import json
@@ -10,7 +10,7 @@ import json
 # All test files should start with 'test_'
 # Standard convention is test_<name of thing being tested>
 
-# All test classes should start with 'Test'
+# All test events should start with 'Test'
 class TestViews:
 
     JOIN_URL = "JOIN_URI"
@@ -26,9 +26,9 @@ class TestViews:
         return user_viewset
 
     def mock_classviewset(self):
-        class_viewset = ClassViewSet()
-        ClassViewSet.get_zoom_proxy = MagicMock(return_value=self.mock_zoomproxy())
-        return class_viewset
+        event_viewset = EventViewSet()
+        EventViewSet.get_zoom_proxy = MagicMock(return_value=self.mock_zoomproxy())
+        return event_viewset
 
     def mock_zoommeetings_view(self):
         zoom_meetings_view = ZoomMeetingsView()
@@ -39,16 +39,16 @@ class TestViews:
         return zoom_meetings_listview
 
     def mock_classserializer(self, exists=False):
-        class_serializer = ClassSerializer()
-        class_serializer.save = MagicMock(return_value=self.mock_class(exists=exists))
-        return class_serializer
+        event_serializer = EventSerializer()
+        event_serializer.save = MagicMock(return_value=self.mock_class(exists=exists))
+        return event_serializer
 
     def mock_user(self):
         user = CustomUser()
         return user
 
     def mock_class(self, exists=False):
-        _class = Class()
+        _class = Event()
         if exists:
             _class.meeting_link = TestViews.JOIN_URL
             _class.super_link = TestViews.START_URL
@@ -105,16 +105,16 @@ class TestViews:
         user_viewset.update.assert_called_with(ANY, partial=True)
 
     def test_classviewset_perform_create_success(self):
-        class_viewset = self.mock_classviewset()
-        class_serializer = self.mock_classserializer(exists=False)
-        class_viewset.perform_create(class_serializer)
-        class_viewset.get_zoom_proxy().create_meeting.assert_called()
+        event_viewset = self.mock_classviewset()
+        event_serializer = self.mock_classserializer(exists=False)
+        event_viewset.perform_create(event_serializer)
+        event_viewset.get_zoom_proxy().create_meeting.assert_called()
 
     def test_classviewset_perform_create_already_exists(self):
-        class_viewset = self.mock_classviewset()
-        class_serializer = self.mock_classserializer(exists=True)
-        class_viewset.perform_create(class_serializer)
-        class_viewset.get_zoom_proxy().create_meeting.assert_not_called()
+        event_viewset = self.mock_classviewset()
+        event_serializer = self.mock_classserializer(exists=True)
+        event_viewset.perform_create(event_serializer)
+        event_viewset.get_zoom_proxy().create_meeting.assert_not_called()
 
     def test_zoommeeting_view_proxy_exists(self):
         zoom_meetings_view = self.mock_zoommeetings_view()

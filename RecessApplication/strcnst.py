@@ -2,5 +2,5 @@
 class ErrorMsg() :
     
     @staticmethod
-    def class_dne():
+    def event_dne():
         return 'The class does not exist!'

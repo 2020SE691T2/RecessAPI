@@ -46,53 +46,53 @@ class CustomUserManager(BaseUserManager):
         CustomUserManager.logger.info("Created superuser %s", user)
         return user
 
-class ClassManager(models.Manager):
+class EventManager(models.Manager):
     logger = logging.getLogger(__name__)
 
     """
-    Custom class model manager where class id is the unique identifier.
+    Custom event model manager where class id is the unique identifier.
     """
-    def get_class_data(self, class_id, **extra_fields):
+    def get_event_data(self, event_id, **extra_fields):
         """
-        return a class.
+        return an event.
         """
-        ClassManager.logger.debug("Getting class data for id %s", class_id)
-        if not class_id:
-            raise ValueError(_(ErrorMsg.class_dne()))
-        class_data = self.model(class_id=class_id, **extra_fields)
-        return class_data
+        EventManager.logger.debug("Getting event data for id %s", event_id)
+        if not event_id:
+            raise ValueError(_(ErrorMsg.event_dne()))
+        event_data = self.model(event_id=event_id, **extra_fields)
+        return event_data
 
-class ClassEnrollmentManager(models.Manager):
+class EventEnrollmentManager(models.Manager):
     logger = logging.getLogger(__name__)
 
     """
-    Custom class model manager where enrollment id is the unique identifier.
+    Custom event model manager where enrollment id is the unique identifier.
     """
-    def get_class_enrollment_data(self, class_id, **extra_fields):
+    def get_event_enrollment_data(self, event_id, **extra_fields):
         """
-        return a class.
+        return an event.
         """
-        ClassEnrollmentManager.logger.debug("Getting class enrollment data for id %s", class_id)
-        if not class_id:
-            raise ValueError(_(ErrorMsg.class_dne()))
-        class_data = self.model(class_id=class_id, **extra_fields)
-        return class_data
+        EventEnrollmentManager.logger.debug("Getting class enrollment data for id %s", event_id)
+        if not event_id:
+            raise ValueError(_(ErrorMsg.event_dne()))
+        event_data = self.model(event_id=event_id, **extra_fields)
+        return event_data
 
-class ClassScheduleManager(models.Manager):
+class EventScheduleManager(models.Manager):
     logger = logging.getLogger(__name__)
     
     """
-    Custom class model manager where class id is the unique identifier.
+    Custom event model manager where event id is the unique identifier.
     """
-    def get_class_schedule_data(self, class_id, **extra_fields):
+    def get_event_schedule_data(self, event_id, **extra_fields):
         """
-        return a class.
+        return an event.
         """
-        ClassScheduleManager.logger.debug("Getting class schedule data for id %s", class_id)
-        if not class_id:
-            raise ValueError(_(ErrorMsg.class_dne()))
-        class_data = self.model(class_id=class_id, **extra_fields)
-        return class_data
+        EventScheduleManager.logger.debug("Getting event schedule data for id %s", event_id)
+        if not event_id:
+            raise ValueError(_(ErrorMsg.event_dne()))
+        event_data = self.model(event_id=event_id, **extra_fields)
+        return event_data
 
 class AssignmentManager(models.Manager):
     logger = logging.getLogger(__name__)
@@ -102,7 +102,7 @@ class AssignmentManager(models.Manager):
     """
     def get_assignment_schedule_data(self, assignment_id, **extra_fields):
         """
-        return a class.
+        return an assignment.
         """
         AssignmentManager.logger.debug("Getting assignment data for id %s", assignment_id)
         if not assignment_id:
@@ -110,33 +110,33 @@ class AssignmentManager(models.Manager):
         assignment_data = self.model(assignment_id=assignment_id, **extra_fields)
         return assignment_data
 
-class ClassRosterManager(models.Manager):
+class EventRosterManager(models.Manager):
     logger = logging.getLogger(__name__)
 
     """
-    Custom class roster model manager where roster id is the unique identifier.
+    Custom event roster model manager where roster id is the unique identifier.
     """
     def get_roster_data(self, roster_id, **extra_fields):
         """
-        return a class.
+        return an event roster.
         """
-        ClassRosterManager.logger.debug("Getting roster data for id %s", roster_id)
+        EventRosterManager.logger.debug("Getting roster data for id %s", roster_id)
         if not roster_id:
             raise ValueError(_('The roster does not exist!'))
         roster_data = self.model(roster_id=roster_id, **extra_fields)
         return roster_data
 
-class ClassRosterParticipantManager(models.Manager):
+class EventRosterParticipantManager(models.Manager):
     logger = logging.getLogger(__name__)
 
     """
-    Custom class roster participant model manager where roster id and email address is the unique identifier.
+    Custom event roster participant model manager where roster id and email address is the unique identifier.
     """
     def get_roster_participant_data(self, roster_id, email_address, **extra_fields):
         """
-        return a class.
+        return a roster participant.
         """
-        ClassRosterParticipantManager.logger.debug("Getting assignment data for id %s %s", roster_id, email_address)
+        EventRosterParticipantManager.logger.debug("Getting roster participant data for id %s %s", roster_id, email_address)
         if not roster_id or not email_address:
             raise ValueError(_('The roster participant does not exist!'))
         roster_participant_data = self.model(roster_id=roster_id, email_address=email_address, **extra_fields)

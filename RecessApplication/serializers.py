@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import serializers, exceptions
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from RecessApplication.models import CustomUser, Class, ClassEnrollment, ClassSchedule, Assignment, ClassRoster, ClassRosterParticipant
+from RecessApplication.models import CustomUser, Event, EventEnrollment, EventSchedule, Assignment, EventRoster, EventRosterParticipant
 from django.contrib.auth import authenticate
 from django.db.models import Max
 import logging
@@ -87,49 +87,51 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
         model = Group
         fields = ['url', 'name']
 
-class ClassSerializer(serializers.HyperlinkedModelSerializer):
+class EventEnrollmentSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = Class
-        fields = ['class_id', 'class_name', 'meeting_link', 'year', 'section']
+        model = EventEnrollment
+        fields = ['enrollment_id', 'event_id', 'roster_id']
 
-class ClassEnrollmentSerializer(serializers.HyperlinkedModelSerializer):
+class EventScheduleSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = ClassEnrollment
-        fields = ['enrollment_id', 'class_id', 'roster_id']
+        model = EventSchedule
+        fields = ['event_id', 'schedule_id', 'weekday', 'start_time', 'end_time']
 
-class ClassScheduleSerializer(serializers.HyperlinkedModelSerializer):
+class EventSerializer(serializers.HyperlinkedModelSerializer):
+    event_schedule = EventScheduleSerializer(source='schedule', many=True, required=False)
+    event_enrollment = EventEnrollmentSerializer(source='enrollment', many=True, required=False)
+    
     class Meta:
-        model = ClassSchedule
-        fields = ['class_id', 'schedule_id', 'weekday', 'start_time', 'end_time']
+        model = Event
+        fields = ['event_id', 'event_name', 'year', 'section', 'meeting_link', 'super_link', 'event_schedule', 'event_enrollment']
+        lookup_field = 'event_id'
 
 class AssignmentSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Assignment
-        fields = ['assignment_id', 'name', 'description', 'assigned_date', 'due_date', 'class_id']
+        fields = ['assignment_id', 'name', 'description', 'assigned_date', 'due_date', 'event_id']
 
-class ClassRosterParticipantSerializer(serializers.ModelSerializer):
-
+class EventRosterParticipantSerializer(serializers.ModelSerializer):
     class Meta:
-        model = ClassRosterParticipant
+        model = EventRosterParticipant
         fields = ['roster_id', 'email_address']
 
-class ClassRosterSerializer(serializers.ModelSerializer):
-    participants = ClassRosterParticipantSerializer(many=True)
+class EventRosterSerializer(serializers.ModelSerializer):
+    participants = EventRosterParticipantSerializer(many=True)
     logger = logging.getLogger(__name__)
 
     class Meta:
-        model = ClassRoster
+        model = EventRoster
         fields = ['roster_id', 'roster_name', 'participants']
         read_only_fields = ['roster_id']
-
+    
     def create(self, validated_data):
         participants_data = validated_data.pop('participants')
-        roster_id = ClassRoster.objects.aggregate(Max('roster_id'))['roster_id__max']
-
+        roster_id = EventRoster.objects.aggregate(Max('roster_id'))['roster_id__max']
+        
         if roster_id is None:
             roster_id = 0
         roster_id = roster_id + 1
-
         roster = ClassRoster.objects.create(roster_id=roster_id, **validated_data)
 
         self.add_participants(roster_id, participants_data)
