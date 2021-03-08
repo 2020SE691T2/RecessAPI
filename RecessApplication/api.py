@@ -34,7 +34,13 @@ class CreateEventAPI(generics.GenericAPIView):
         return the 'next' id from ids of type schedule_id in the database
         '''
         return EventSchedule.objects.all().aggregate(Max('schedule_id'))['schedule_id__max'] + 1
-    
+
+    def getNextEnrollmentId(self):
+        '''
+        return the 'next' id from ids of type enrollment_id in the database
+        '''
+        return EventEnrollment.objects.all().aggregate(Max('enrollment_id'))['enrollment_id__max'] + 1
+
     def post(self, request, *args, **kwargs):
         next_event_id = self.getNextEventId()
         event_data = self.saveEvent(request.data, next_event_id)
@@ -43,6 +49,7 @@ class CreateEventAPI(generics.GenericAPIView):
                 "error": "The data was not valid."
             })
         self.saveEventSchedule(request.data, next_event_id)
+        self.saveEventEnrollment(request.data, next_event_id)
         return Response({
                 "event_id": next_event_id
             })
@@ -76,9 +83,9 @@ class CreateEventAPI(generics.GenericAPIView):
             'meeting_link' : meeting["join_url"],
             'super_link' : meeting["start_url"],
         }
-        serializer = EventSerializer(data=args)
-        if serializer.is_valid(raise_exception=True):
-            return serializer.save()
+        event_serializer = EventSerializer(data=args)
+        if event_serializer.is_valid(raise_exception=True):
+            return event_serializer.save()
         return False
     
     def saveEventSchedule(self, data, next_event_id):
@@ -90,6 +97,14 @@ class CreateEventAPI(generics.GenericAPIView):
                                          weekday=day, 
                                          start_time=start_time,
                                          end_time=end_time)
+        return
+    
+    def saveEventEnrollment(self, data, next_event_id):
+        if (data['roster'] == None or data['roster'] == ""):
+            return
+        EventEnrollment.objects.create(enrollment_id=self.getNextEnrollmentId(), 
+                                       event_id=next_event_id, 
+                                       roster_id=int(data['roster']))
         return
 
     def getLogger(self):
@@ -154,12 +169,13 @@ class WeeklyScheduleAPI(generics.GenericAPIView):
     def get(self, request):
         user = request.user
         participants = self.getRosterParticipants().filter(email_address=user.email_address).values()
-
+        
         roster_ids = set()
         for participant in participants: 
-            roster_ids.add(participant["roster_id"])    
+            roster_ids.add(participant["roster_id"])
+        
         enrollments = self.getEventEnrollments().filter(roster_id__in=roster_ids).values()
-
+        
         if not self.exists(enrollments):
             return Response({
                 "error": "User is not enrolled in or teaching any events."
@@ -181,7 +197,7 @@ class WeeklyScheduleAPI(generics.GenericAPIView):
             event_year = year - 1
         
         event_ids = [ e['event_id'] for e in enrollments ]
-        events = self.getEventes().filter(event_id__in=event_ids, year=event_year).values()
+        events = self.getEvents().filter(event_id__in=event_ids, year=event_year).values()
 
         result = []
         if self.exists(events):
@@ -189,7 +205,7 @@ class WeeklyScheduleAPI(generics.GenericAPIView):
             
             for cs in event_schedules:
                 event_item = next((cl for cl in events if cl['event_id'] == cs['event_id']), {})
-                if (not event_item) or (event_item['year'] != event_year): continue
+                if (not event_item) or (int(event_item['year']) != event_year): continue
                 cs.update(event_item)
                 enr_item = next((enr for enr in enrollments if enr['event_id'] == cs['event_id']), {})
                 cs.update(enr_item)
@@ -197,7 +213,7 @@ class WeeklyScheduleAPI(generics.GenericAPIView):
                     cs['weekday'] = day
                     new_cs = copy.deepcopy(cs)       
                     result.append(new_cs)
-
+        
         return Response({
             "schedules": result
         })
@@ -217,7 +233,7 @@ class WeeklyScheduleAPI(generics.GenericAPIView):
     def getEventEnrollments(self):
         return EventEnrollment.objects
 
-    def getEventes(self):
+    def getEvents(self):
         return Event.objects
     
     def getEventSchedules(self):

@@ -104,7 +104,6 @@ class EventSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Event
         fields = ['event_id', 'event_name', 'year', 'section', 'meeting_link', 'super_link', 'event_schedule', 'event_enrollment']
-        lookup_field = 'event_id'
 
 class AssignmentSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
@@ -159,12 +158,12 @@ class EventRosterSerializer(serializers.ModelSerializer):
 
     def add_participants(self, roster_id, participants_data):
         participant_id = self.get_next_participant_id()
-
+        
         for participant in participants_data:
             participant.roster_id = roster_id
             EventRosterParticipant.objects.create(participant_id=participant_id, roster_id=roster_id, **participant)
             participant_id = participant_id + 1
-
+    
     def get_next_participant_id(self):
         participant_id = EventRosterParticipant.objects.aggregate(Max('participant_id'))['participant_id__max']
         if participant_id is None:
