@@ -48,7 +48,7 @@ class ZoomProxy:
 
     """
     def create_meeting(self, data):
-
+        
         defaults = self.set_meeting_defaults(data)
         topic = defaults["topic"]
         meeting_type = defaults["meeting_type"]
@@ -58,7 +58,10 @@ class ZoomProxy:
         weekly_days = defaults["weekly_days"]
         end_time = defaults["end_time"]
         end_date_time = defaults["end_date_time"]
-
+        
+        print("Zoom api end time = ", end="")
+        print(end_time)
+        
         if meeting_type == None:
             # Default to weekly recurring meeting
             meeting_type = ZoomProxy.RECURRING_MEETING_FIXED
@@ -67,9 +70,9 @@ class ZoomProxy:
         if weekly_days == None:
             # Default to M-F
             weekly_days = "2,3,4,5,6" # Monday thru Friday
-
+        
         ZoomProxy.logger.info("Creating meeting for topic %s, type %s, start time %s", topic, meeting_type, start_time)
-
+        
         # General scenario - no recurrence
         recurrence = None
         # Top-level settings for all meetings
@@ -78,7 +81,7 @@ class ZoomProxy:
         settings["mute_upon_entry"] = True
         settings["auto_recording"] = "none"
         settings["join_before_host"] = False
-
+        
         # Most likely scenario - Plug in default recurrence parameters
         if meeting_type == ZoomProxy.RECURRING_MEETING_FIXED or meeting_type == ZoomProxy.RECURRING_MEETING_UNFIXED:
             ZoomProxy.logger.info("Creating a recurring fixed meeting - using defaults to have a weekly meeting M-F")
@@ -91,13 +94,13 @@ class ZoomProxy:
             if (recurrence_type == ZoomProxy.RECURRING_MEETING_WEEKLY):
                 recurrence["weekly_days"] = weekly_days
             if end_time:
-                recurrence["end_time"] = end_time
+                recurrence["end_date"] = end_time.year
             else:
                 recurrence["end_date_time"] = end_date_time
-
-        meeting_create_response = self.get_client().meeting.create(user_id=ZoomProxy.user_id, topic=topic, type=meeting_type, start_time=start_time, duration=duration, recurrence=recurrence, settings=settings)
+        
+        meeting_create_response = self.get_client().meeting.create(user_id=ZoomProxy.user_id, topic=topic, type=meeting_type, start_time=start_time, duration_min=duration, recurrence=recurrence, settings=settings)
         content = self.format_json_output(meeting_create_response.content)
-
+        
         ZoomProxy.logger.info("Create meeting response (%s): %s", meeting_create_response.status_code, content)
         
         return Response(content, status=meeting_create_response.status_code)

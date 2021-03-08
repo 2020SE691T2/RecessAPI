@@ -1,6 +1,6 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.db.models import Max
-from rest_framework import generics
+from rest_framework import generics, serializers
 from rest_framework.permissions import AllowAny, BasePermission, IsAuthenticated
 from .permissions import IsStaffPermission
 from .cache import TeacherStudentCache
@@ -20,7 +20,7 @@ class CreateEventAPI(generics.GenericAPIView):
     logger = logging.getLogger(__name__)
     zoom_proxy = ZoomProxy()
     
-    def convertDatetime(self, time_obj):        
+    def convertDatetime(self, time_obj):
         return datetime.fromisoformat('2021-01-01T' + time_obj + ':00')
 
     def getNextEventId(self):
@@ -55,13 +55,14 @@ class CreateEventAPI(generics.GenericAPIView):
                 week_days += ", "
             week_days += str(int(data['days'][i]) + 2)
         start = self.convertDatetime(data['start'])
-        end = self.convertDatetime(data['end'])
+        end = self.convertDatetime(data['end'])     
         
         zoom_data = {
             'topic': data['event_name'],
             'meeting_type': 8,
             'start_time': start,
-            'duration': (end - start).total_seconds() / 1000 / 60,
+            'end_time': end,
+            'duration': (end - start).total_seconds() / 60,
             'weekly_days': week_days,
             'year': data['year']
         }

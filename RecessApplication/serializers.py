@@ -132,7 +132,7 @@ class EventRosterSerializer(serializers.ModelSerializer):
         if roster_id is None:
             roster_id = 0
         roster_id = roster_id + 1
-        roster = ClassRoster.objects.create(roster_id=roster_id, **validated_data)
+        roster = EventRoster.objects.create(roster_id=roster_id, **validated_data)
 
         self.add_participants(roster_id, participants_data)
 
@@ -150,7 +150,7 @@ class EventRosterSerializer(serializers.ModelSerializer):
         if not participants_data is None:
             self.logger.info("Replace participants")
 
-            ClassRosterParticipant.objects.filter(roster_id=roster_id).delete()
+            EventRosterParticipant.objects.filter(roster_id=roster_id).delete()
             self.add_participants(roster_id, participants_data)
 
         instance.save()
@@ -162,11 +162,11 @@ class EventRosterSerializer(serializers.ModelSerializer):
 
         for participant in participants_data:
             participant.roster_id = roster_id
-            ClassRosterParticipant.objects.create(participant_id=participant_id, roster_id=roster_id, **participant)
+            EventRosterParticipant.objects.create(participant_id=participant_id, roster_id=roster_id, **participant)
             participant_id = participant_id + 1
 
     def get_next_participant_id(self):
-        participant_id = ClassRosterParticipant.objects.aggregate(Max('participant_id'))['participant_id__max']
+        participant_id = EventRosterParticipant.objects.aggregate(Max('participant_id'))['participant_id__max']
         if participant_id is None:
             participant_id = 0
         return participant_id + 1
