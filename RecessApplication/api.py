@@ -97,7 +97,6 @@ class CreateEventAPI(generics.GenericAPIView):
                                          weekday=day, 
                                          start_time=start_time,
                                          end_time=end_time)
-        return
     
     def saveEventEnrollment(self, data, next_event_id):
         if (data['roster'] == None or data['roster'] == ""):
@@ -105,7 +104,6 @@ class CreateEventAPI(generics.GenericAPIView):
         EventEnrollment.objects.create(enrollment_id=self.getNextEnrollmentId(), 
                                        event_id=next_event_id, 
                                        roster_id=int(data['roster']))
-        return
 
     def getLogger(self):
         return CreateEventAPI.logger

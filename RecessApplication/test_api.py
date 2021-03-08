@@ -154,7 +154,7 @@ class TestApi:
         schedule_api = MockWeeklyScheduleAPI()
         schedule_api.getRosterParticipants = MagicMock(return_value=self.mock_roster_data())
         schedule_api.getEventEnrollments = MagicMock(return_value=self.mock_enrollment_data(has_enrollments))
-        schedule_api.getEventes = MagicMock(return_value=self.mock_event_data())
+        schedule_api.getEvents = MagicMock(return_value=self.mock_event_data())
         schedule_api.getEventSchedules = MagicMock(return_value=self.mock_event_schedule_data())
         schedule_api.enrollments_exists = MagicMock()
         return schedule_api
