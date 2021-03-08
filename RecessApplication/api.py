@@ -181,7 +181,7 @@ class WeeklyScheduleAPI(generics.GenericAPIView):
             event_year = year - 1
         
         event_ids = [ e['event_id'] for e in enrollments ]
-        events = self.getEventes().filter(event_id__in=event_ids, year=event_year).values()
+        events = self.getEvents().filter(event_id__in=event_ids, year=event_year).values()
 
         result = []
         if self.exists(events):
@@ -189,7 +189,7 @@ class WeeklyScheduleAPI(generics.GenericAPIView):
             
             for cs in event_schedules:
                 event_item = next((cl for cl in events if cl['event_id'] == cs['event_id']), {})
-                if (not event_item) or (event_item['year'] != event_year): continue
+                if (not event_item) or (int(event_item['year']) != event_year): continue
                 cs.update(event_item)
                 enr_item = next((enr for enr in enrollments if enr['event_id'] == cs['event_id']), {})
                 cs.update(enr_item)
@@ -217,7 +217,7 @@ class WeeklyScheduleAPI(generics.GenericAPIView):
     def getEventEnrollments(self):
         return EventEnrollment.objects
 
-    def getEventes(self):
+    def getEvents(self):
         return Event.objects
     
     def getEventSchedules(self):
