@@ -5,6 +5,7 @@ from RecessApplication.models import CustomUser, Event, EventEnrollment, EventSc
 from django.contrib.auth import authenticate
 from django.db.models import Max
 import logging
+import uuid
 
 class CustomUserSerializer(serializers.HyperlinkedModelSerializer):
 
@@ -15,7 +16,7 @@ class CustomUserSerializer(serializers.HyperlinkedModelSerializer):
         write_only_fields = ['password']
 
     def create(self, validated_data):
-        print(validated_data)
+        validated_data['physical_id_num'] = self.get_next_physical_id_num()
         return CustomUser.objects.create_user(validated_data.pop('password'), **validated_data)
 
     def create_superuser(self, validated_data):
@@ -41,8 +42,11 @@ class CustomUserSerializer(serializers.HyperlinkedModelSerializer):
         else:
             self.instance = self.create(validated_data)
             assert self.instance is not None, ('`create()` did not return an object instance.')
-
+        
         return self.instance
+    
+    def get_next_physical_id_num(self):
+        return str(uuid.uuid4())
 
 class LoginUserSerializer(serializers.Serializer):
     email_address = serializers.EmailField()
