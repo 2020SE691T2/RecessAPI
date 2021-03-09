@@ -133,25 +133,6 @@ class Event(models.Model):
     def __str__(self):
         return str(self.event_id)
 
-class EventEnrollment(models.Model):
-    """
-    """
-    # required and unique
-    enrollment_id = models.IntegerField(primary_key=True)
-    event = models.ForeignKey(Event, related_name='enrollment', on_delete=models.CASCADE)
-    roster_id = models.IntegerField()
-
-    CLASSNAME_FIELD = 'enrollment_id'
-    REQUIRED_FIELDS = ['event', 'roster_id']
-    
-    objects = EventEnrollmentManager()
-    
-    class Meta:
-        db_table = 'event_enrollment'
-    
-    def __str__(self):
-        return str(self.event_id)
-
 class EventRoster(models.Model):
     """
     """
@@ -185,6 +166,25 @@ class EventRosterParticipant(models.Model):
     
     def __str__(self):
         return str(self.roster_id) + " " + self.email_address
+
+class EventEnrollment(models.Model):
+    """
+    """
+    # required and unique
+    enrollment_id = models.IntegerField(primary_key=True)
+    event = models.ForeignKey(Event, related_name='enrollment', on_delete=models.CASCADE)
+    roster = models.ForeignKey(EventRoster, related_name='roster', on_delete=models.CASCADE)
+    
+    CLASSNAME_FIELD = 'enrollment_id'
+    REQUIRED_FIELDS = ['event', 'roster']
+    
+    objects = EventEnrollmentManager()
+    
+    class Meta:
+        db_table = 'event_enrollment'
+    
+    def __str__(self):
+        return str(self.event_id)
 
 class EventSchedule(models.Model):
     """
