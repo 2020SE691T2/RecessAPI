@@ -173,10 +173,10 @@ class EventEnrollment(models.Model):
     # required and unique
     enrollment_id = models.IntegerField(primary_key=True)
     event = models.ForeignKey(Event, related_name='enrollment', on_delete=models.CASCADE)
-    roster = models.ForeignKey(EventRoster, related_name='roster', on_delete=models.CASCADE)
+    roster_id = models.IntegerField()
     
     CLASSNAME_FIELD = 'enrollment_id'
-    REQUIRED_FIELDS = ['event', 'roster']
+    REQUIRED_FIELDS = ['event', 'roster_id']
     
     objects = EventEnrollmentManager()
     

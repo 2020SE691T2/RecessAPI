@@ -100,10 +100,70 @@ class EventScheduleSerializer(serializers.HyperlinkedModelSerializer):
 class EventSerializer(serializers.HyperlinkedModelSerializer):
     event_schedule = EventScheduleSerializer(source='schedule', many=True, required=False)
     event_enrollment = EventEnrollmentSerializer(source='enrollment', many=True, required=False)
-    
+    logger = logging.getLogger(__name__)
+
     class Meta:
         model = Event
         fields = ['event_id', 'event_name', 'year', 'section', 'meeting_link', 'super_link', 'event_schedule', 'event_enrollment']
+    
+    def update(self, instance, validated_data):
+        
+        event_id = instance.event_id
+        
+        # Cannot update event number - will ignore on event_schedule
+        instance.event_name = validated_data.get('event_name', instance.event_name)
+        
+        # Only replace schedule if 'event_schedule' entry was included
+        # Otherwise leave current schedule
+        schedule_data = validated_data.get('schedule', None)
+        if not schedule_data is None:
+            self.logger.info("Replace schedule")
+            
+            EventSchedule.objects.filter(event_id=event_id).delete()
+            self.add_schedule(event_id, schedule_data)
+        
+        # Only replace enrollment if 'event_enrollment' entry was included
+        # Otherwise leave current enrollment
+        enrollment_data = validated_data.get('enrollment', None)        
+        if not enrollment_data is None:
+            self.logger.info("Replace enrollment")
+            
+            EventEnrollment.objects.filter(event_id=event_id).delete()
+            self.add_enrollment(event_id, enrollment_data)
+        
+        instance.save()
+        
+        return instance 
+    
+    def add_schedule(self, event_id, schedule_data):
+        schedule_id = self.get_next_schedule_id()
+        
+        for schedule in schedule_data:
+            schedule.event_id = event_id
+            EventSchedule.objects.create(schedule_id=schedule_id, event_id=event_id, **schedule)
+            schedule_id = schedule_id + 1
+    
+    def get_next_schedule_id(self):
+        schedule_id = EventSchedule.objects.aggregate(Max('schedule_id'))['schedule_id__max']
+        if schedule_id is None:
+            schedule_id = 0
+        return schedule_id + 1
+    
+    def add_enrollment(self, event_id, enrollment_data):
+        enrollment_id=self.get_next_enrollment_id()
+        
+        for enrollment in enrollment_data:
+            enrollment.event_id = event_id
+            EventEnrollment.objects.create(enrollment_id=enrollment_id, event_id=event_id, **enrollment)
+            enrollment_id = enrollment_id + 1
+    
+    def get_next_enrollment_id(self):
+        enrollment_id = EventEnrollment.objects.aggregate(Max('enrollment_id'))['enrollment_id__max']
+        if enrollment_id is None:
+            enrollment_id = 0
+        return enrollment_id + 1
+        
+
 
 class AssignmentSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
