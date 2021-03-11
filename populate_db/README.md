@@ -2,32 +2,33 @@
 
 ## Table of Contents
 * [Schema](#schema)
-* [Generate Mock Data](#generate-mock-data)
 * [Create Environment in Terminal to Build Database](#create-environment-in-terminal-to-build-database)
+* [Generate Mock Data](#generate-mock-data)
 * [Build Database and Populate Tables](#build-database-and-populate-tables)
 * [Deactivate Database Build Environment](deactivate-database-build-environment)
 
 ## Schema
 Schema is set in ```db_schema.py```
 
+\[[toc](#table-of-contents)\]
+
+## Create Environment in Terminal to Build Database
+```console
+// - Linux / macOS
+source ./create_and_update_venv.sh <db_version>
+
+// - Windows
+./create_and_update_venv.sh <db_version>
+```
+\[[toc](#table-of-contents)\]
+
+Where `<db_version>` is Heroku for the production database and local for the local database. Note that the script defaults to “local” if no `<db_version>` is provided.
+
 ## Generate Mock Data
 ```console
 python gen_mock_data.py
 ```
-
-## Create Environment in Terminal to Build Database
-**The following variables will need to be set in the environment:**
-```console
-database_uri
-```
-Save these variables in a file ```envvars.txt``` in the same directory as ```create_and_update_venv.sh```, in the format:
-```console
-database_uri=<somestring>
-```
-**DO NOT USE " "**\
-\
-The appropriate values for database_url can be found by going to [Database Credentials: View Credentials...](https://data.heroku.com/datastores/016518f2-8a2b-4645-96e9-3ce4ef69f60d#administration) and copying URI. \
-Note these should be already stored in the supplied ```envvars.txt``` file.
+\[[toc](#table-of-contents)\]
 
 ### Build Local Instance of POSTGRESQL Database
 
@@ -59,6 +60,8 @@ In pgAdmin, Create a new Server.
 * Under the Connection Tab, set the Host name/address to "localhost"
 * Enter Password: "password"
 
+\[[toc](#table-of-contents)\]
+
 
 #### Build Local Instance
 
@@ -73,11 +76,13 @@ chmod u+x ./create_and_update_venv.sh
 ```
 prior to running.
 
+\[[toc](#table-of-contents)\]
+
 ### Build Heroku Database
 
 In the terminal, run
 ```console
-source ./create_and_update_venv.sh
+source ./create_and_update_venv.sh Heroku
 ```
 
 **NOTE:** may require
@@ -85,6 +90,8 @@ source ./create_and_update_venv.sh
 chmod u+x ./create_and_update_venv.sh
 ```
 prior to running.
+
+\[[toc](#table-of-contents)\]
 
 ## Build Database and Populate Tables
 ```console
@@ -97,8 +104,10 @@ chmod u+x ./build_db.sh
 ```
 prior to running.
 
+\[[toc](#table-of-contents)\]
+
 ## Deactivate Database Build Environment
 ```console
 deactivate
 ```
-
+\[[toc](#table-of-contents)\]
