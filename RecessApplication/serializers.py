@@ -166,8 +166,6 @@ class EventSerializer(serializers.HyperlinkedModelSerializer):
         if enrollment_id is None:
             enrollment_id = 0
         return enrollment_id + 1
-        
-
 
 class AssignmentSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
